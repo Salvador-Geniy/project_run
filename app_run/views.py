@@ -8,5 +8,5 @@ def get_club_data(request):
         "company_name": "My company",
         "slogan": "My slogan",
         "contacts": "My company contacts",
-    }, 200)
+    })
 
