@@ -19,12 +19,13 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
-from app_run.views import get_club_data, RunViewSet
+from app_run.views import get_club_data, RunViewSet, UserReadOnlyViewSet
 
 from rest_framework.routers import SimpleRouter
 router = SimpleRouter()
 
 router.register(r"api/runs", RunViewSet, basename="runs")
+router.register(r"api/users", UserReadOnlyViewSet, basename="users")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
