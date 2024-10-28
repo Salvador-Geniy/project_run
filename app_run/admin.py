@@ -10,5 +10,22 @@ class ClubDataAdmin(ModelAdmin):
 
 @admin.register(models.Run)
 class RunAdmin(ModelAdmin):
-    pass
+    list_display = (
+        "id",
+        "athlete",
+        "comment",
+        "status",
+        "created_at",
+    )
+
+    fields = (
+        "athlete",
+        "comment",
+    )
+
+    def get_fields(self, request, obj=None):
+        if obj:
+            return ("comment",)
+        return self.fields
+
 

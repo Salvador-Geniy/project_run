@@ -1,13 +1,15 @@
 from django.contrib.auth.models import User
 
 from app_run.models import Run
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.serializers import ModelSerializer, SerializerMethodField, CharField
 
 
 class RunSerializer(ModelSerializer):
+    status = CharField(source="get_status_display", read_only=True)
+
     class Meta:
         model = Run
-        fields = ["id", "athlete", "comment", "created_at"]
+        fields = ["id", "athlete", "comment", "status", "created_at"]
 
 
 class UserSerializer(ModelSerializer):
