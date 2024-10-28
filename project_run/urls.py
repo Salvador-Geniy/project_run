@@ -19,7 +19,13 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
-from app_run.views import get_club_data, RunViewSet, UserReadOnlyViewSet
+from app_run.views import (
+    get_club_data,
+    RunViewSet,
+    UserReadOnlyViewSet,
+    RunStartView,
+    RunStopView,
+)
 
 from rest_framework.routers import SimpleRouter
 router = SimpleRouter()
@@ -30,5 +36,7 @@ router.register(r"api/users", UserReadOnlyViewSet, basename="users")
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/company_details/', get_club_data, name='company-details'),
+    path("api/runs/<int:run_id>/start/", RunStartView.as_view(), name="run-start"),
+    path("api/runs/<int:run_id>/stop/", RunStopView.as_view(), name="run-start"),
     path("", include(router.urls)),
 ]
