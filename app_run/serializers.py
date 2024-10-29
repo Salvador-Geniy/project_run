@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 
 from app_run.models import Run
-from rest_framework.serializers import ModelSerializer, SerializerMethodField, CharField
+from rest_framework.serializers import ModelSerializer, SerializerMethodField, CharField, IntegerField
 
 
 class RunSerializer(ModelSerializer):
@@ -14,6 +14,7 @@ class RunSerializer(ModelSerializer):
 
 class UserSerializer(ModelSerializer):
     type = SerializerMethodField()
+    runs_finished = IntegerField(read_only=True)
 
     class Meta:
         model = User
@@ -23,6 +24,7 @@ class UserSerializer(ModelSerializer):
             "last_name",
             "first_name",
             "type",
+            "runs_finished",
         ]
 
     def get_type(self, instance) -> str:
