@@ -1,3 +1,4 @@
+from django.db.models import Count, Case, When
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -26,7 +27,11 @@ class UserReadOnlyViewSet(ReadOnlyModelViewSet):
     serializer_class = UserSerializer
 
     def get_queryset(self):
-        qs = User.objects.filter(is_superuser=False)
+        qs = (
+            User.objects.filter(is_superuser=False)
+            # .prefetch_related("user_run")
+            .annotate(runs_finished=Count(Case(When(user_run__status=3, then=1))))
+        )
         type_filter = self.request.query_params.get("type")
         if type_filter:
             match type_filter:
