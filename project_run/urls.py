@@ -25,6 +25,7 @@ from app_run.views import (
     UserReadOnlyViewSet,
     RunStartView,
     RunStopView,
+    PositionViewSet,
 )
 
 from rest_framework.routers import SimpleRouter
@@ -32,6 +33,7 @@ router = SimpleRouter()
 
 router.register(r"api/runs", RunViewSet, basename="runs")
 router.register(r"api/users", UserReadOnlyViewSet, basename="users")
+router.register(r"api/positions", PositionViewSet, basename="positions")
 
 urlpatterns = [
     path('admin/', admin.site.urls),

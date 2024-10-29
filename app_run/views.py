@@ -1,11 +1,11 @@
-from django.db.models import Count, Case, When
+from django.db.models import Count, Case, When, Q
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from app_run.models import Run
-from app_run.serializers import RunSerializer, UserSerializer
+from app_run.models import Run, Position
+from app_run.serializers import RunSerializer, UserSerializer, PositionSerializer
 from django.contrib.auth.models import User
 from rest_framework.filters import SearchFilter
 
@@ -32,8 +32,7 @@ class UserReadOnlyViewSet(ReadOnlyModelViewSet):
     def get_queryset(self):
         qs = (
             User.objects.filter(is_superuser=False)
-            # .prefetch_related("user_run")
-            .annotate(runs_finished=Count(Case(When(user_run__status=3, then=1))))
+            .annotate(runs_finished=Count("user_run", filter=Q(user_run__status=3)))
         )
         type_filter = self.request.query_params.get("type")
         if type_filter:
@@ -69,3 +68,15 @@ class RunStopView(APIView):
         run.status = 3
         run.save()
         return Response({"Detail": "Run stopped"}, 200)
+
+
+class PositionViewSet(ModelViewSet):
+    queryset = Position.objects.select_related("run")
+    serializer_class = PositionSerializer
+    lookup_url_kwarg = "run"
+
+    def filter_queryset(self, queryset):
+        run_id = self.request.query_params.get(self.lookup_url_kwarg)
+        if run_id:
+            return queryset.filter(run=run_id)
+        return queryset
