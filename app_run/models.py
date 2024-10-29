@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 
@@ -34,4 +35,23 @@ class Run(models.Model):
     class Meta:
         verbose_name = "забег"
         verbose_name_plural = "забеги"
+
+
+class Position(models.Model):
+    run = models.ForeignKey(to=Run, on_delete=models.CASCADE, verbose_name="забег")
+    latitude = models.FloatField(
+        validators=[MinValueValidator(-90.0), MaxValueValidator(90.0)],
+        verbose_name="широта"
+    )
+    longitude = models.FloatField(
+        validators=[MinValueValidator(-180.0), MaxValueValidator(180.0)],
+        verbose_name="долгота"
+    )
+
+    def __str__(self):
+        return f"{self.run}: {self.latitude}, {self.longitude}"
+
+    class Meta:
+        verbose_name = "координаты забега"
+        verbose_name_plural = "координаты забегов"
 

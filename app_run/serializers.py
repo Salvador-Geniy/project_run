@@ -1,7 +1,13 @@
 from django.contrib.auth.models import User
-
-from app_run.models import Run
-from rest_framework.serializers import ModelSerializer, SerializerMethodField, CharField, IntegerField
+from app_run.models import Run, Position
+from rest_framework.serializers import (
+    ModelSerializer,
+    SerializerMethodField,
+    CharField,
+    IntegerField,
+    ValidationError,
+    FloatField,
+)
 
 
 class RunSerializer(ModelSerializer):
@@ -33,3 +39,22 @@ class UserSerializer(ModelSerializer):
                 return "coach"
             case _:
                 return "athlete"
+
+
+class PositionSerializer(ModelSerializer):
+    latitude = FloatField(min_value=-90.0, max_value=90.0)
+    longitude = FloatField(min_value=-180.0, max_value=180.0)
+
+    class Meta:
+        model = Position
+        fields = [
+            "id",
+            "run",
+            "latitude",
+            "longitude",
+        ]
+
+    def validate_run(self, run):
+        if run.status != 2:
+            raise ValidationError("Run must have status 'in_process'")
+        return run
