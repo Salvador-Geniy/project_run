@@ -7,6 +7,7 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from app_run.models import Run
 from app_run.serializers import RunSerializer, UserSerializer
 from django.contrib.auth.models import User
+from rest_framework.filters import SearchFilter
 
 
 @api_view(["GET"])
@@ -25,6 +26,8 @@ class RunViewSet(ModelViewSet):
 
 class UserReadOnlyViewSet(ReadOnlyModelViewSet):
     serializer_class = UserSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ["first_name", "last_name"]
 
     def get_queryset(self):
         qs = (
@@ -40,16 +43,6 @@ class UserReadOnlyViewSet(ReadOnlyModelViewSet):
                 case "athlete":
                     qs = qs.filter(is_staff=False)
         return qs
-
-    def filter_queryset(self, queryset):
-        type_filter = self.request.query_params.get("type")
-        if type_filter:
-            match type_filter:
-                case "coach":
-                    queryset = queryset.filter(is_staff=True)
-                case "athlete":
-                    queryset = queryset.filter(is_staff=False)
-        return queryset
 
 
 class RunStartView(APIView):
