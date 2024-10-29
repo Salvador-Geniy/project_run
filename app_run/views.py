@@ -44,16 +44,6 @@ class UserReadOnlyViewSet(ReadOnlyModelViewSet):
                     qs = qs.filter(is_staff=False)
         return qs
 
-    def filter_queryset(self, queryset):
-        type_filter = self.request.query_params.get("type")
-        if type_filter:
-            match type_filter:
-                case "coach":
-                    queryset = queryset.filter(is_staff=True)
-                case "athlete":
-                    queryset = queryset.filter(is_staff=False)
-        return queryset
-
 
 class RunStartView(APIView):
     serializer_class = None
