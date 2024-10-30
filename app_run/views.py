@@ -34,8 +34,12 @@ class RunViewSet(ModelViewSet):
     def filter_queryset(self, queryset):
         status_dict = {value: key for key, value in Run.STATUS_CHOICES}
         status_value = self.request.query_params.get("status")
-        if status_value:
+        print(status_value)
+        print(status_value.isalpha())
+        if status_value and not status_value.isdigit():
             queryset = queryset.filter(status=status_dict.get(status_value.lower()))
+        elif status_value and status_value.isdigit():
+            queryset = super().filter_queryset(queryset)
         return queryset
 
 
@@ -66,9 +70,9 @@ class RunStartView(APIView):
     def post(self, request, *args, **kwargs):
         run_id = kwargs.get("run_id")
         run = get_object_or_404(Run, pk=run_id)
-        if run.status != "init":
+        if run.status != 1:
             return Response({"Detail": "Wrong run status"}, 400)
-        run.status = "in_progress"
+        run.status = 2
         run.save()
         return Response({"Detail": "Run started"}, 200)
 
