@@ -1,4 +1,4 @@
-from django.db.models import Count, Case, When, Q
+from django.db.models import Count, Q
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -8,7 +8,7 @@ from app_run.models import Run, Position
 from app_run.serializers import RunSerializer, UserSerializer, PositionSerializer
 from django.contrib.auth.models import User
 from rest_framework.filters import SearchFilter, OrderingFilter
-from .services import get_distance
+from .services import get_distance, get_run_time_seconds
 from django_filters.rest_framework import DjangoFilterBackend
 
 
@@ -30,18 +30,6 @@ class RunViewSet(ModelViewSet):
     ]
     filterset_fields = ["status"]
     ordering_fields = ["created_at"]
-
-    # def filter_queryset(self, queryset):
-    #     status_dict = {value: key for key, value in Run.STATUS_CHOICES}
-    #     status_value = self.request.query_params.get("status")
-    #     if status_value and not status_value.isdigit():
-    #         queryset = queryset.filter(status=status_dict.get(status_value.lower()))
-    #     elif status_value and status_value.isdigit():
-    #         queryset = super().filter_queryset(queryset)
-    #     ord_value = self.request.query_params.get("ordering")
-    #     if ord_value:
-    #
-    #     return queryset
 
 
 class UserReadOnlyViewSet(ReadOnlyModelViewSet):
@@ -86,15 +74,22 @@ class RunStopView(APIView):
         run = get_object_or_404(Run, pk=run_id)
         if run.status != "in_progress":
             return Response({"Detail": "Wrong run status"}, 400)
+
         positions = self.get_positions(run)
         dist_total = get_distance(positions)
-        run.distance = dist_total
-        run.status = "finished"
-        run.save()
+        run_time_seconds = get_run_time_seconds(positions)
+        self.update_run_fields(run, dist_total, run_time_seconds)
+
         return Response({"Detail": "Run stopped"}, 200)
 
     def get_positions(self, run):
         return Position.objects.filter(run=run)
+
+    def update_run_fields(self, run: Run, dist_total: int, run_time_seconds: int) -> None:
+        run.distance = dist_total
+        run.status = "finished"
+        run.run_time_seconds = run_time_seconds
+        run.save(update_fields=["distance", "status", "run_time_seconds"])
 
 
 class PositionViewSet(ModelViewSet):

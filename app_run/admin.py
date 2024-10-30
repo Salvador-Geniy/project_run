@@ -16,6 +16,7 @@ class RunAdmin(ModelAdmin):
         "comment",
         "status",
         "distance",
+        "run_time_seconds",
         "created_at",
     )
 
@@ -28,5 +29,10 @@ class RunAdmin(ModelAdmin):
         if obj:
             return ("comment", "status")
         return self.fields
+
+
+@admin.register(models.Position)
+class PositionAdmin(ModelAdmin):
+    pass
 
 
