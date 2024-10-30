@@ -28,6 +28,7 @@ class Run(models.Model):
     comment = models.CharField(max_length=255, verbose_name="комментарий")
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=1, verbose_name="статус забега")
     created_at = models.DateTimeField(auto_now=True, verbose_name="дата начала")
+    distance = models.FloatField(default=0)
 
     def __str__(self):
         return f"{self.athlete.username}, {self.get_status_display()}"

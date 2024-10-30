@@ -12,10 +12,11 @@ from rest_framework.serializers import (
 
 class RunSerializer(ModelSerializer):
     status = CharField(source="get_status_display", read_only=True)
+    distance = FloatField(read_only=True)
 
     class Meta:
         model = Run
-        fields = ["id", "athlete", "comment", "status", "created_at"]
+        fields = ["id", "athlete", "comment", "status", "created_at", "distance"]
 
 
 class UserSerializer(ModelSerializer):

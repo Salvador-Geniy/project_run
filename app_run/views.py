@@ -8,6 +8,7 @@ from app_run.models import Run, Position
 from app_run.serializers import RunSerializer, UserSerializer, PositionSerializer
 from django.contrib.auth.models import User
 from rest_framework.filters import SearchFilter
+from .services import get_distance
 
 
 @api_view(["GET"])
@@ -32,6 +33,7 @@ class UserReadOnlyViewSet(ReadOnlyModelViewSet):
     def get_queryset(self):
         qs = (
             User.objects.filter(is_superuser=False)
+            .prefetch_related("user_run")
             .annotate(runs_finished=Count("user_run", filter=Q(user_run__status=3)))
         )
         type_filter = self.request.query_params.get("type")
@@ -65,9 +67,15 @@ class RunStopView(APIView):
         run = get_object_or_404(Run, pk=run_id)
         if run.status != 2:
             return Response({"Detail": "Wrong run status"}, 400)
+        positions = self.get_positions(run)
+        dist_total = get_distance(positions)
+        run.distance = dist_total
         run.status = 3
         run.save()
         return Response({"Detail": "Run stopped"}, 200)
+
+    def get_positions(self, run):
+        return Position.objects.filter(run=run)
 
 
 class PositionViewSet(ModelViewSet):
