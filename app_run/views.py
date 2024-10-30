@@ -31,6 +31,13 @@ class RunViewSet(ModelViewSet):
     filterset_fields = ["status"]
     ordering_fields = ["created_at"]
 
+    def filter_queryset(self, queryset):
+        status_dict = {value: key for key, value in Run.STATUS_CHOICES}
+        status_value = self.request.query_params.get("status")
+        if status_value:
+            queryset = queryset.filter(status=status_dict.get(status_value.lower()))
+        return queryset
+
 
 class UserReadOnlyViewSet(ReadOnlyModelViewSet):
     serializer_class = UserSerializer
@@ -59,9 +66,9 @@ class RunStartView(APIView):
     def post(self, request, *args, **kwargs):
         run_id = kwargs.get("run_id")
         run = get_object_or_404(Run, pk=run_id)
-        if run.status != 1:
+        if run.status != "init":
             return Response({"Detail": "Wrong run status"}, 400)
-        run.status = 2
+        run.status = "in_progress"
         run.save()
         return Response({"Detail": "Run started"}, 200)
 
