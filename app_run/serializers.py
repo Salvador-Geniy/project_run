@@ -64,18 +64,18 @@ class PositionSerializer(ModelSerializer):
             raise ValidationError("Run must have status 'in_progress'")
         return run
 
-    def compare_times(self, run, date_time) -> None:
-        if run.created_at > date_time:
-            raise ValidationError("Position date_time can't be less than the run start time")
-
-    def create(self, validated_data):
-        run = validated_data.get("run")
-        date_time = validated_data.get("date_time")
-        self.compare_times(run, date_time)
-        return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        run = validated_data.get("run") or instance.run
-        date_time = validated_data.get("date_time") or instance.date_time
-        self.compare_times(run, date_time)
-        return super().update(instance, validated_data)
+    # def compare_times(self, run, date_time) -> None:
+    #     if run.created_at > date_time:
+    #         raise ValidationError("Position date_time can't be less than the run start time")
+    #
+    # def create(self, validated_data):
+    #     run = validated_data.get("run")
+    #     date_time = validated_data.get("date_time")
+    #     self.compare_times(run, date_time)
+    #     return super().create(validated_data)
+    #
+    # def update(self, instance, validated_data):
+    #     run = validated_data.get("run") or instance.run
+    #     date_time = validated_data.get("date_time") or instance.date_time
+    #     self.compare_times(run, date_time)
+    #     return super().update(instance, validated_data)
