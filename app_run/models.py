@@ -28,7 +28,8 @@ class Run(models.Model):
     comment = models.CharField(max_length=255, verbose_name="комментарий")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="init", verbose_name="статус забега")
     created_at = models.DateTimeField(auto_now=True, verbose_name="дата начала")
-    distance = models.FloatField(default=0)
+    distance = models.FloatField(default=0, verbose_name="пройденная дистанция в км")
+    run_time_seconds = models.IntegerField(default=0, verbose_name="время забега в секундах")
 
     def __str__(self):
         return f"{self.athlete.username}, {self.get_status_display()}"
@@ -48,6 +49,7 @@ class Position(models.Model):
         validators=[MinValueValidator(-180.0), MaxValueValidator(180.0)],
         verbose_name="долгота"
     )
+    date_time = models.DateTimeField(verbose_name="дата и время позиции")
 
     def __str__(self):
         return f"{self.run}: {self.latitude}, {self.longitude}"
