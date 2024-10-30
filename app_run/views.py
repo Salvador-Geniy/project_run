@@ -34,8 +34,6 @@ class RunViewSet(ModelViewSet):
     def filter_queryset(self, queryset):
         status_dict = {value: key for key, value in Run.STATUS_CHOICES}
         status_value = self.request.query_params.get("status")
-        print(status_value)
-        print(status_value.isalpha())
         if status_value and not status_value.isdigit():
             queryset = queryset.filter(status=status_dict.get(status_value.lower()))
         elif status_value and status_value.isdigit():
