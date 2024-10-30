@@ -59,9 +59,9 @@ class RunStartView(APIView):
     def post(self, request, *args, **kwargs):
         run_id = kwargs.get("run_id")
         run = get_object_or_404(Run, pk=run_id)
-        if run.status != "init":
+        if run.status != 1:
             return Response({"Detail": "Wrong run status"}, 400)
-        run.status = "in_progress"
+        run.status = 2
         run.save()
         return Response({"Detail": "Run started"}, 200)
 
@@ -72,12 +72,12 @@ class RunStopView(APIView):
     def post(self, request, *args, **kwargs):
         run_id = kwargs.get("run_id")
         run = get_object_or_404(Run, pk=run_id)
-        if run.status != "in_progress":
+        if run.status != 2:
             return Response({"Detail": "Wrong run status"}, 400)
         positions = self.get_positions(run)
         dist_total = get_distance(positions)
         run.distance = dist_total
-        run.status = "finished"
+        run.status = 3
         run.save()
         return Response({"Detail": "Run stopped"}, 200)
 
