@@ -22,13 +22,13 @@ def get_club_data(request):
 
 
 class RunViewSet(ModelViewSet):
-    queryset = Run.objects.all()
+    queryset = Run.objects.select_related("athlete")
     serializer_class = RunSerializer
     filter_backends = [
         DjangoFilterBackend,
         OrderingFilter,
     ]
-    filterset_fields = ["status"]
+    filterset_fields = ["status", "id"]
     ordering_fields = ["created_at"]
 
 

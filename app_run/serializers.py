@@ -11,14 +11,26 @@ from rest_framework.serializers import (
 )
 
 
+class UserDataSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "last_name",
+            "first_name",
+        ]
+
+
 class RunSerializer(ModelSerializer):
     status = CharField(source="get_status_display", read_only=True)
     distance = FloatField(read_only=True)
     run_time_seconds = IntegerField(read_only=True)
+    athlete_data = UserDataSerializer(source="athlete", read_only=True)
 
     class Meta:
         model = Run
-        fields = ["id", "athlete", "comment", "status", "created_at", "distance", "run_time_seconds"]
+        fields = ["id", "athlete", "comment", "status", "created_at", "distance", "run_time_seconds", "athlete_data"]
 
 
 class UserSerializer(ModelSerializer):
