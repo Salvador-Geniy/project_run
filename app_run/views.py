@@ -31,14 +31,17 @@ class RunViewSet(ModelViewSet):
     filterset_fields = ["status"]
     ordering_fields = ["created_at"]
 
-    def filter_queryset(self, queryset):
-        status_dict = {value: key for key, value in Run.STATUS_CHOICES}
-        status_value = self.request.query_params.get("status")
-        if status_value and not status_value.isdigit():
-            queryset = queryset.filter(status=status_dict.get(status_value.lower()))
-        elif status_value and status_value.isdigit():
-            queryset = super().filter_queryset(queryset)
-        return queryset
+    # def filter_queryset(self, queryset):
+    #     status_dict = {value: key for key, value in Run.STATUS_CHOICES}
+    #     status_value = self.request.query_params.get("status")
+    #     if status_value and not status_value.isdigit():
+    #         queryset = queryset.filter(status=status_dict.get(status_value.lower()))
+    #     elif status_value and status_value.isdigit():
+    #         queryset = super().filter_queryset(queryset)
+    #     ord_value = self.request.query_params.get("ordering")
+    #     if ord_value:
+    #
+    #     return queryset
 
 
 class UserReadOnlyViewSet(ReadOnlyModelViewSet):
@@ -68,9 +71,9 @@ class RunStartView(APIView):
     def post(self, request, *args, **kwargs):
         run_id = kwargs.get("run_id")
         run = get_object_or_404(Run, pk=run_id)
-        if run.status != 1:
+        if run.status != "init":
             return Response({"Detail": "Wrong run status"}, 400)
-        run.status = 2
+        run.status = "in_progress"
         run.save()
         return Response({"Detail": "Run started"}, 200)
 
@@ -81,12 +84,12 @@ class RunStopView(APIView):
     def post(self, request, *args, **kwargs):
         run_id = kwargs.get("run_id")
         run = get_object_or_404(Run, pk=run_id)
-        if run.status != 2:
+        if run.status != "in_progress":
             return Response({"Detail": "Wrong run status"}, 400)
         positions = self.get_positions(run)
         dist_total = get_distance(positions)
         run.distance = dist_total
-        run.status = 3
+        run.status = "finished"
         run.save()
         return Response({"Detail": "Run stopped"}, 200)
 

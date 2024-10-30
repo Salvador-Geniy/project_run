@@ -56,6 +56,6 @@ class PositionSerializer(ModelSerializer):
         ]
 
     def validate_run(self, run):
-        if run.status != 2:
+        if run.status != "in_progress":
             raise ValidationError("Run must have status 'in_progress'")
         return run
