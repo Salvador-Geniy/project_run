@@ -17,21 +17,21 @@ class ClubData(models.Model):
 
 
 class Run(models.Model):
-    STATUS_CHOICES = (
-        (1, "init"),
-        (2, "in_progress"),
-        (3, "finished"),
-    )
+    STATUS_CHOICES = {
+        "init": "init",
+        "in_progress": "in_progress",
+        "finished": "finished",
+    }
     athlete = models.ForeignKey(
         to=User, on_delete=models.PROTECT, verbose_name="бегун", related_name="user_run"
     )
     comment = models.CharField(max_length=255, verbose_name="комментарий")
-    status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=1, verbose_name="статус забега")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="init", verbose_name="статус забега")
     created_at = models.DateTimeField(auto_now=True, verbose_name="дата начала")
     distance = models.FloatField(default=0)
 
     def __str__(self):
-        return f"{self.athlete.username}, {self.get_status_display()}"
+        return f"{self.athlete.username}, {self.status}"
 
     class Meta:
         verbose_name = "забег"
