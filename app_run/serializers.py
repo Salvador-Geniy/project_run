@@ -11,7 +11,7 @@ from rest_framework.serializers import (
 
 
 class RunSerializer(ModelSerializer):
-    status = CharField(source="get_status_display", read_only=True)
+    status = CharField(read_only=True)
     distance = FloatField(read_only=True)
 
     class Meta:
@@ -56,6 +56,6 @@ class PositionSerializer(ModelSerializer):
         ]
 
     def validate_run(self, run):
-        if run.status != 2:
-            raise ValidationError("Run must have status 'in_process'")
+        if run.status != "in_progress":
+            raise ValidationError("Run must have status 'in_progress'")
         return run

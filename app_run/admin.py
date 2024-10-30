@@ -22,7 +22,6 @@ class RunAdmin(ModelAdmin):
     fields = (
         "athlete",
         "comment",
-        "status",
     )
 
     def get_fields(self, request, obj=None):

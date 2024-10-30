@@ -7,8 +7,9 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from app_run.models import Run, Position
 from app_run.serializers import RunSerializer, UserSerializer, PositionSerializer
 from django.contrib.auth.models import User
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 from .services import get_distance
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 @api_view(["GET"])
@@ -23,6 +24,12 @@ def get_club_data(request):
 class RunViewSet(ModelViewSet):
     queryset = Run.objects.all()
     serializer_class = RunSerializer
+    filter_backends = [
+        DjangoFilterBackend,
+        OrderingFilter,
+    ]
+    filterset_fields = ["status"]
+    ordering_fields = ["created_at"]
 
 
 class UserReadOnlyViewSet(ReadOnlyModelViewSet):
@@ -52,9 +59,9 @@ class RunStartView(APIView):
     def post(self, request, *args, **kwargs):
         run_id = kwargs.get("run_id")
         run = get_object_or_404(Run, pk=run_id)
-        if run.status != 1:
+        if run.status != "init":
             return Response({"Detail": "Wrong run status"}, 400)
-        run.status = 2
+        run.status = "in_progress"
         run.save()
         return Response({"Detail": "Run started"}, 200)
 
@@ -65,12 +72,12 @@ class RunStopView(APIView):
     def post(self, request, *args, **kwargs):
         run_id = kwargs.get("run_id")
         run = get_object_or_404(Run, pk=run_id)
-        if run.status != 2:
+        if run.status != "in_progress":
             return Response({"Detail": "Wrong run status"}, 400)
         positions = self.get_positions(run)
         dist_total = get_distance(positions)
         run.distance = dist_total
-        run.status = 3
+        run.status = "finished"
         run.save()
         return Response({"Detail": "Run stopped"}, 200)
 
