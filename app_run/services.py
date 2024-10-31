@@ -53,5 +53,7 @@ def get_distance_speed_from_last_position(prev_position, validated_data) -> dict
 
 
 def get_average_speed(positions: QuerySet["Position"]) -> float:
+    if not positions:
+        return 0
     avg_speed = positions.aggregate(avg_speed=Avg("speed")).get("avg_speed")
     return round(avg_speed, 2)
