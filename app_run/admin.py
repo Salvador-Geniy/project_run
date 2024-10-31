@@ -38,6 +38,8 @@ class PositionAdmin(ModelAdmin):
         "run",
         "latitude",
         "longitude",
+        "distance",
+        "speed",
         "date_time",
     ]
 
