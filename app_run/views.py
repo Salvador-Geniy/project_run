@@ -8,7 +8,7 @@ from app_run.models import Run, Position
 from app_run.serializers import RunSerializer, UserSerializer, PositionSerializer
 from django.contrib.auth.models import User
 from rest_framework.filters import SearchFilter, OrderingFilter
-from .services import get_distance, get_run_time_seconds
+from .services import get_distance, get_run_time_seconds, get_average_speed
 from django_filters.rest_framework import DjangoFilterBackend
 
 
@@ -78,18 +78,20 @@ class RunStopView(APIView):
         positions = self.get_positions(run)
         dist_total = get_distance(positions)
         run_time_seconds = get_run_time_seconds(positions)
-        self.update_run_fields(run, dist_total, run_time_seconds)
+        avg_speed = get_average_speed(positions)
+        self.update_run_fields(run, dist_total, run_time_seconds, avg_speed)
 
         return Response({"Detail": "Run stopped"}, 200)
 
     def get_positions(self, run):
         return Position.objects.filter(run=run)
 
-    def update_run_fields(self, run: Run, dist_total: int, run_time_seconds: int) -> None:
+    def update_run_fields(self, run: Run, dist_total: float, run_time_seconds: int, avg_speed: float) -> None:
         run.distance = dist_total
         run.status = "finished"
         run.run_time_seconds = run_time_seconds
-        run.save(update_fields=["distance", "status", "run_time_seconds"])
+        run.speed = avg_speed
+        run.save(update_fields=["distance", "status", "run_time_seconds", "speed"])
 
 
 class PositionViewSet(ModelViewSet):
@@ -102,3 +104,13 @@ class PositionViewSet(ModelViewSet):
         if run_id:
             return queryset.filter(run=run_id)
         return queryset
+
+    def get_serializer_context(self):
+        run_id = self.request.data.get("run")
+        prev_position = self.get_prev_position(run_id)
+        context = super().get_serializer_context()
+        context |= {"prev_position": prev_position}
+        return context
+
+    def get_prev_position(self, run_id: int) -> Position | None:
+        return Position.objects.filter(run_id=run_id).order_by("-id").first()
