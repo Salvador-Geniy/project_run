@@ -41,7 +41,7 @@ class UserReadOnlyViewSet(ReadOnlyModelViewSet):
         qs = (
             User.objects.filter(is_superuser=False)
             .prefetch_related("user_run")
-            .annotate(runs_finished=Count("user_run", filter=Q(user_run__status=3)))
+            .annotate(runs_finished=Count("user_run", filter=Q(user_run__status="finished")))
         )
         type_filter = self.request.query_params.get("type")
         if type_filter:
