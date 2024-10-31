@@ -30,6 +30,7 @@ class Run(models.Model):
     created_at = models.DateTimeField(auto_now=True, verbose_name="дата начала")
     distance = models.FloatField(default=0, verbose_name="пройденная дистанция в км")
     run_time_seconds = models.IntegerField(default=0, verbose_name="время забега в секундах")
+    speed = models.FloatField(default=0, verbose_name="средняя скорость в м/с")
 
     def __str__(self):
         return f"{self.athlete.username}, {self.get_status_display()}"
@@ -50,6 +51,8 @@ class Position(models.Model):
         verbose_name="долгота"
     )
     date_time = models.DateTimeField(verbose_name="дата и время позиции")
+    speed = models.FloatField(default=0, verbose_name="скорость в м/с")
+    distance = models.FloatField(default=0, verbose_name="пройденная дистанция")
 
     def __str__(self):
         return f"{self.run}: {self.latitude}, {self.longitude}"

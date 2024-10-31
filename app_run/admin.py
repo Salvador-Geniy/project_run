@@ -33,6 +33,12 @@ class RunAdmin(ModelAdmin):
 
 @admin.register(models.Position)
 class PositionAdmin(ModelAdmin):
-    pass
+    list_display = [
+        "id",
+        "run",
+        "latitude",
+        "longitude",
+        "date_time",
+    ]
 
 
