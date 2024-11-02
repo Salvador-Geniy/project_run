@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from app_run.models import Run, Position
+from app_run.models import Run, Position, Subscribe
 from rest_framework.serializers import (
     ModelSerializer,
     SerializerMethodField,
@@ -8,6 +8,7 @@ from rest_framework.serializers import (
     ValidationError,
     FloatField,
     DateTimeField,
+    PrimaryKeyRelatedField,
 )
 from .services import get_distance_speed_from_last_position
 
@@ -68,6 +69,30 @@ class UserSerializer(ModelSerializer):
                 return "athlete"
 
 
+class CoachSerializer(UserSerializer):
+    athletes = SerializerMethodField(read_only=True)
+
+    class Meta(UserSerializer.Meta):
+        fields = [
+            *UserSerializer.Meta.fields,
+            "athletes"
+        ]
+
+    def get_athletes(self, obj) -> list[int]:
+        athletes = obj.coach_subscribe.all().values_list("id", flat=True)
+        return athletes
+
+
+class AthleteSerializer(UserSerializer):
+    coach = IntegerField(source="athlete_subscribe.coach_id", read_only=True)
+
+    class Meta(UserSerializer.Meta):
+        fields = [
+            *UserSerializer.Meta.fields,
+            "coach"
+        ]
+
+
 class PositionSerializer(ModelSerializer):
     latitude = FloatField(min_value=-90.0, max_value=90.0)
     longitude = FloatField(min_value=-180.0, max_value=180.0)
@@ -98,18 +123,21 @@ class PositionSerializer(ModelSerializer):
             validated_data = get_distance_speed_from_last_position(prev_position, validated_data)
         return super().create(validated_data)
 
-    # def compare_times(self, run, date_time) -> None:
-    #     if run.created_at > date_time:
-    #         raise ValidationError("Position date_time can't be less than the run start time")
-    #
-    # def create(self, validated_data):
-    #     run = validated_data.get("run")
-    #     date_time = validated_data.get("date_time")
-    #     self.compare_times(run, date_time)
-    #     return super().create(validated_data)
-    #
-    # def update(self, instance, validated_data):
-    #     run = validated_data.get("run") or instance.run
-    #     date_time = validated_data.get("date_time") or instance.date_time
-    #     self.compare_times(run, date_time)
-    #     return super().update(instance, validated_data)
+
+class SubscribeSerializer(ModelSerializer):
+    athlete = PrimaryKeyRelatedField(
+        queryset=User.objects.filter(is_staff=False)
+    )
+
+    class Meta:
+        model = Subscribe
+        fields = ["coach", "athlete"]
+
+    def check_existing_suscribe(self, athlete) -> None:
+        if Subscribe.objects.filter(athlete=athlete).exists():
+            raise ValidationError("Subscribe already exists")
+
+    def create(self, validated_data):
+        athlete = validated_data.get("athlete")
+        self.check_existing_suscribe(athlete)
+        return super().create(validated_data)

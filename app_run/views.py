@@ -1,11 +1,19 @@
 from django.db.models import Count, Q
+from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.generics import get_object_or_404
+from rest_framework.generics import get_object_or_404, CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from app_run.models import Run, Position
-from app_run.serializers import RunSerializer, UserSerializer, PositionSerializer
+from app_run.serializers import (
+    RunSerializer,
+    UserSerializer,
+    PositionSerializer,
+    SubscribeSerializer,
+    CoachSerializer,
+    AthleteSerializer,
+)
 from django.contrib.auth.models import User
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .services import get_distance, get_run_time_seconds, get_average_speed
@@ -47,10 +55,30 @@ class UserReadOnlyViewSet(ReadOnlyModelViewSet):
         if type_filter:
             match type_filter:
                 case "coach":
-                    qs = qs.filter(is_staff=True)
+                    qs = qs.filter(is_staff=True).prefetch_related("coach_subscribe")
                 case "athlete":
-                    qs = qs.filter(is_staff=False)
+                    qs = qs.filter(is_staff=False).select_related("athlete_subscribe")
         return qs
+
+    def get_serializer_class(self, is_coach: bool):
+        match self.action:
+            case "retrieve":
+                match is_coach:
+                    case True:
+                        return CoachSerializer
+                    case _:
+                        return AthleteSerializer
+            case "list":
+                return self.serializer_class
+
+    def get_serializer(self, *args, **kwargs):
+        if self.action == "list":
+            serializer_class = self.serializer_class
+        else:
+            is_coach = args[0].is_staff
+            serializer_class = self.get_serializer_class(is_coach)
+        kwargs.setdefault('context', self.get_serializer_context())
+        return serializer_class(*args, **kwargs)
 
 
 class RunStartView(APIView):
@@ -114,3 +142,20 @@ class PositionViewSet(ModelViewSet):
 
     def get_prev_position(self, run_id: int) -> Position | None:
         return Position.objects.filter(run_id=run_id).order_by("-id").first()
+
+
+class SubscribeView(CreateAPIView):
+    serializer_class = SubscribeSerializer
+
+    def post(self, request, *args, **kwargs):
+        coach_id = kwargs.get("id")
+        coach = get_object_or_404(User, pk=coach_id, is_staff=True, is_superuser=False)
+
+        data = request.data
+        data |= {"coach": coach.id}
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

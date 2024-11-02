@@ -61,3 +61,21 @@ class Position(models.Model):
         verbose_name = "координаты забега"
         verbose_name_plural = "координаты забегов"
 
+
+class Subscribe(models.Model):
+    coach = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        verbose_name="тренер",
+        related_name="coach_subscribe"
+    )
+    athlete = models.OneToOneField(
+        to=User,
+        on_delete=models.CASCADE,
+        verbose_name="бегун",
+        related_name="athlete_subscribe"
+    )
+
+    class Meta:
+        verbose_name = "подписка на тренера"
+        verbose_name_plural = "подписки на тренера"
