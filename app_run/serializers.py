@@ -125,6 +125,9 @@ class PositionSerializer(ModelSerializer):
 
 
 class SubscribeSerializer(ModelSerializer):
+    coach = PrimaryKeyRelatedField(
+        queryset=User.objects.filter(is_staff=True)
+    )
     athlete = PrimaryKeyRelatedField(
         queryset=User.objects.filter(is_staff=False)
     )
