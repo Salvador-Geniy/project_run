@@ -149,7 +149,7 @@ class SubscribeView(CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         coach_id = kwargs.get("id")
-        coach = get_object_or_404(User, pk=coach_id, is_staff=True, is_superuser=False)
+        coach = get_object_or_404(User, pk=coach_id)
 
         data = request.data
         data |= {"coach": coach.id}
