@@ -147,15 +147,15 @@ class PositionViewSet(ModelViewSet):
 class SubscribeView(CreateAPIView):
     serializer_class = SubscribeSerializer
 
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         coach_id = kwargs.get("id")
         coach = get_object_or_404(User, pk=coach_id)
 
         data = request.data
-        data |= {"coach": coach.id}
+        data["coach"] = coach.id
 
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK, headers=headers)

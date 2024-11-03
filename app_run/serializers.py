@@ -79,7 +79,7 @@ class CoachSerializer(UserSerializer):
         ]
 
     def get_athletes(self, obj) -> list[int]:
-        athletes = obj.coach_subscribe.all().values_list("id", flat=True)
+        athletes = obj.coach_subscribe.all().values_list("athlete_id", flat=True)
         return athletes
 
 
