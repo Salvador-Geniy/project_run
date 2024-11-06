@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth.models import User
 from app_run.models import Run, Position, Subscribe
 from rest_framework.serializers import (
@@ -96,7 +98,7 @@ class AthleteSerializer(UserSerializer):
 class PositionSerializer(ModelSerializer):
     latitude = FloatField(min_value=-90.0, max_value=90.0)
     longitude = FloatField(min_value=-180.0, max_value=180.0)
-    date_time = DateTimeField(format="%Y-%m-%dT%H:%M:%S.%f")
+    date_time = DateTimeField(format="%Y-%m-%dT%H:%M:%S.%f", required=False)
     speed = FloatField(read_only=True)
     distance = FloatField(read_only=True)
 
@@ -118,6 +120,9 @@ class PositionSerializer(ModelSerializer):
         return run
 
     def create(self, validated_data):
+        date_time = validated_data.get("date_time")
+        if not date_time:
+            validated_data["date_time"] = datetime.datetime.now()
         prev_position = self.context.get("prev_position")
         if prev_position:
             validated_data = get_distance_speed_from_last_position(prev_position, validated_data)
