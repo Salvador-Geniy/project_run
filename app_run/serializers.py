@@ -122,7 +122,7 @@ class PositionSerializer(ModelSerializer):
     def create(self, validated_data):
         date_time = validated_data.get("date_time")
         if not date_time:
-            validated_data["date_time"] = datetime.datetime.now()
+            validated_data["date_time"] = datetime.datetime.now(datetime.timezone.utc)
         prev_position = self.context.get("prev_position")
         if prev_position:
             validated_data = get_distance_speed_from_last_position(prev_position, validated_data)
