@@ -32,8 +32,11 @@ def _get_current_distance(prev_latitude, prev_longitude, cur_latitude, cur_longi
 
 
 def _get_current_speed(prev_time, cur_time, distance) -> float:
-    time = (cur_time - prev_time).seconds
-    return round(distance * 1000 / time, 2)
+    try:
+        time = (cur_time - prev_time).seconds
+        return round(distance * 1000 / time, 2)
+    except ZeroDivisionError:
+        return 0
 
 
 def get_distance_speed_from_last_position(prev_position, validated_data) -> dict[str, [str | int | float]]:
