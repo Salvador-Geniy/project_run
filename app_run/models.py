@@ -79,3 +79,14 @@ class Subscribe(models.Model):
     class Meta:
         verbose_name = "подписка на тренера"
         verbose_name_plural = "подписки на тренера"
+
+
+class Challenge(models.Model):
+    full_name = models.CharField(max_length=255, verbose_name="название")
+    athlete = models.ForeignKey(
+        to=User, on_delete=models.PROTECT, verbose_name="бегун", related_name="user_challenge"
+    )
+
+    class Meta:
+        verbose_name = "челлендж"
+        verbose_name_plural = "челленджи"

@@ -1,7 +1,7 @@
 import datetime
 
 from django.contrib.auth.models import User
-from app_run.models import Run, Position, Subscribe
+from app_run.models import Run, Position, Subscribe, Challenge
 from rest_framework.serializers import (
     ModelSerializer,
     SerializerMethodField,
@@ -149,3 +149,15 @@ class SubscribeSerializer(ModelSerializer):
         athlete = validated_data.get("athlete")
         self.check_existing_suscribe(athlete)
         return super().create(validated_data)
+
+
+class ChallengeSerializer(ModelSerializer):
+    athlete = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Challenge
+        fields = [
+            "id",
+            "full_name",
+            "athlete",
+        ]

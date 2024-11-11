@@ -58,3 +58,12 @@ class SubscribeAdmin(ModelAdmin):
         elif db_field.name == "athlete":
             kwargs["queryset"] = models.User.objects.filter(is_staff=False).exclude(is_superuser=True)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+@admin.register(models.Challenge)
+class ChallengeAdmin(ModelAdmin):
+    list_display = [
+        "id",
+        "full_name",
+        "athlete",
+    ]
