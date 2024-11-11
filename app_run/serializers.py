@@ -152,8 +152,6 @@ class SubscribeSerializer(ModelSerializer):
 
 
 class ChallengeSerializer(ModelSerializer):
-    athlete = UserSerializer(read_only=True)
-
     class Meta:
         model = Challenge
         fields = [
