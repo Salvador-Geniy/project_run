@@ -1,11 +1,11 @@
 from django.db.models import Count, Q
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.generics import get_object_or_404, CreateAPIView
+from rest_framework.generics import get_object_or_404, CreateAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from app_run.models import Run, Position
+from app_run.models import Run, Position, Challenge
 from app_run.serializers import (
     RunSerializer,
     UserSerializer,
@@ -13,6 +13,7 @@ from app_run.serializers import (
     SubscribeSerializer,
     CoachSerializer,
     AthleteSerializer,
+    ChallengeSerializer,
 )
 from django.contrib.auth.models import User
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -108,7 +109,7 @@ class RunStopView(APIView):
         run_time_seconds = get_run_time_seconds(positions)
         avg_speed = get_average_speed(positions)
         self.update_run_fields(run, dist_total, run_time_seconds, avg_speed)
-
+        self.check_run_count(run.athlete)
         return Response({"Detail": "Run stopped"}, 200)
 
     def get_positions(self, run):
@@ -120,6 +121,12 @@ class RunStopView(APIView):
         run.run_time_seconds = run_time_seconds
         run.speed = avg_speed
         run.save(update_fields=["distance", "status", "run_time_seconds", "speed"])
+
+    @staticmethod
+    def check_run_count(athlete):
+        finished_run_count = Run.objects.filter(athlete=athlete, status="finished").count()
+        if finished_run_count == 10:
+            challenge, _ = Challenge.objects.get_or_create(full_name="Сделай 10 Забегов!", athlete=athlete)
 
 
 class PositionViewSet(ModelViewSet):
@@ -159,3 +166,12 @@ class SubscribeView(CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK, headers=headers)
+
+
+class ChallengeListView(ListAPIView):
+    queryset = Challenge.objects.select_related("athlete")
+    serializer_class = ChallengeSerializer
+    filter_backends = [
+        DjangoFilterBackend,
+    ]
+    filterset_fields = ["athlete"]
