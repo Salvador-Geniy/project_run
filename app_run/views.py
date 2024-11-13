@@ -110,6 +110,7 @@ class RunStopView(APIView):
         avg_speed = get_average_speed(positions)
         self.update_run_fields(run, dist_total, run_time_seconds, avg_speed)
         self.check_run_count(run.athlete)
+        Challenge.objects.get_or_create(full_name="Сделай 10 Забегов!", athlete=run.athlete)
         return Response({"Detail": "Run stopped"}, 200)
 
     def get_positions(self, run):
