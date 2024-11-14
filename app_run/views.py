@@ -121,7 +121,7 @@ class RunStopView(APIView):
             .get("total_distance")
         )
         if total_distance > 50.0:
-            Challenge.objects.create(full_name="New challenge", athlete=athlete)
+            Challenge.objects.create(full_name="Пробеги 50 километров!", athlete=athlete)
 
     def get_positions(self, run):
         return Position.objects.filter(run=run)
