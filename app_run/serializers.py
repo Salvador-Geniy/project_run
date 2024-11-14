@@ -152,13 +152,10 @@ class SubscribeSerializer(ModelSerializer):
 
 
 class ChallengeSerializer(ModelSerializer):
-    fast_name = CharField(source="full_name")
-
     class Meta:
         model = Challenge
         fields = [
             "id",
-            # "full_name",
+            "full_name",
             "athlete",
-            "fast_name"
         ]
