@@ -1,4 +1,4 @@
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404, CreateAPIView, ListAPIView
@@ -110,8 +110,19 @@ class RunStopView(APIView):
         avg_speed = get_average_speed(positions)
         self.update_run_fields(run, dist_total, run_time_seconds, avg_speed)
         self.check_run_count(run.athlete)
-        Challenge.objects.get_or_create(full_name="Сделай 10 Забегов!", athlete=run.athlete)
+        self.check_total_distance(run.athlete)
         return Response({"Detail": "Run stopped"}, 200)
+
+    def check_total_distance(self, athlete):
+        total_distance = (
+            Run.objects
+            .filter(athlete=athlete, status="finished")
+            .aggregate(total_distance=Sum("distance"))
+            .get("total_distance")
+        )
+        if total_distance > 50.0:
+            Challenge.objects.create(full_name="New challenge", athlete=athlete)
+            Challenge.objects.create(full_name="New challenge", athlete=athlete)
 
     def get_positions(self, run):
         return Position.objects.filter(run=run)
