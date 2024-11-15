@@ -111,7 +111,7 @@ class RunStopView(APIView):
         self.update_run_fields(run, dist_total, run_time_seconds, avg_speed)
         self.check_run_count(run.athlete)
         self.check_total_distance(run.athlete)
-        self.check_run_speed(run)
+        # self.check_run_speed(run)
         return Response({"Detail": "Run stopped"}, 200)
 
     def check_run_speed(self, run):
