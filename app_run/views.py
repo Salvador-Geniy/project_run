@@ -111,7 +111,11 @@ class RunStopView(APIView):
         self.update_run_fields(run, dist_total, run_time_seconds, avg_speed)
         self.check_run_count(run.athlete)
         self.check_total_distance(run.athlete)
+        self.check_run_speed(run)
         return Response({"Detail": "Run stopped"}, 200)
+
+    def check_run_speed(self, run):
+        Challenge.objects.create(full_name="Пробеги 50 километров!", athlete=run.athlete)
 
     def check_total_distance(self, athlete):
         total_distance = (
@@ -129,7 +133,7 @@ class RunStopView(APIView):
     def update_run_fields(self, run: Run, dist_total: float, run_time_seconds: int, avg_speed: float) -> None:
         run.distance = dist_total
         run.status = "finished"
-        run.run_time_seconds = run_time_seconds
+        # run.run_time_seconds = run_time_seconds
         run.speed = avg_speed
         run.save(update_fields=["distance", "status", "run_time_seconds", "speed"])
 
