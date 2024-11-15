@@ -115,8 +115,9 @@ class RunStopView(APIView):
         return Response({"Detail": "Run stopped"}, 200)
 
     def check_run_speed(self, run):
+        athlete = User.objects.first()
         if run.run_time_seconds < 600 and run.distance >= 2.0:
-            Challenge.objects.create(full_name="Test challenge", athlete=1)
+            Challenge.objects.create(full_name="Test challenge", athlete=athlete)
 
     def check_total_distance(self, athlete):
         total_distance = (
