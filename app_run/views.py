@@ -131,9 +131,9 @@ class RunStopView(APIView):
         return Position.objects.filter(run=run)
 
     def update_run_fields(self, run: Run, dist_total: float, run_time_seconds: int, avg_speed: float) -> None:
-        run.distance = dist_total
+        # run.distance = dist_total
         run.status = "finished"
-        # run.run_time_seconds = run_time_seconds
+        run.run_time_seconds = run_time_seconds
         run.speed = avg_speed
         run.save(update_fields=["distance", "status", "run_time_seconds", "speed"])
 
