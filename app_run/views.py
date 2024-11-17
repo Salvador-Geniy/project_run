@@ -116,8 +116,7 @@ class RunStopView(APIView):
         return Response({"Detail": "Run stopped"}, 200)
 
     def check_run_speed(self, run):
-
-        if run.run_time_seconds < 700 and run.distance >= 2.0:
+        if run.run_time_seconds < 600 and run.distance >= 2.0:
             Challenge.objects.create(full_name="Пробеги 2 километра меньше чем за 10 минут!", athlete=run.athlete)
 
     def check_total_distance(self, athlete):
