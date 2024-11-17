@@ -208,15 +208,14 @@ class ChallengesSummaryListView(ListAPIView):
         return queryset
 
 
-class ChallengesSummary2(ListAPIView):
-    serializer_class = ChallengesSummaryListSerializer
+class ChallengesSummary2(APIView):
 
-    def get_queryset(self):
-        challenges = Challenge.objects.values("full_name").distinct()
-        users = User.objects.filter(is_staff=False).prefetch_related("user_challenge")
-        for ch in challenges:
-            ch["athletes"] = users.filter(user_challenge__full_name=ch.get("full_name")).distinct()
-        return challenges
+    def get(self, request, *args, **kwargs):
+        data = [
+            {"name_to_display": "Ch 1", "athletes": [{"id": 1, "full_name": "Bob Good"}, {"id": 2, "full_name": "Alice Good"}]},
+            {"name_to_display": "Ch 2", "athletes": [{"id": 3, "full_name": "Bob Bad"}, {"id": 2, "full_name": "Alice Good"}]},
+        ]
+        return Response(data=data, status=200)
 
 
 
