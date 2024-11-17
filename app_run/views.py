@@ -204,7 +204,7 @@ class ChallengesSummaryListView(ListAPIView):
         for obj in queryset:
             obj["athletes"] = User.objects.filter(user_challenge__full_name=obj.get("full_name"))
             res.append(obj)
-        return res
+        return queryset
 
 
 
