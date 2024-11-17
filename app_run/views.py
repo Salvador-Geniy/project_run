@@ -213,7 +213,8 @@ class ChallengesSummary2(APIView):
     def get(self, request, *args, **kwargs):
         data = [
             {"name_to_display": "Сделай 10 Забегов!", "athletes": [{"id": 1, "full_name": "Bob Good"}, {"id": 2, "full_name": "Alice Good"}]},
-            {"name_to_display": "Ch 2", "athletes": [{"id": 3, "full_name": "Bob Bad"}, {"id": 2, "full_name": "Alice Good"}]},
+            {"name_to_display": "Пробеги 50 километров!", "athletes": [{"id": 3, "full_name": "Bob Bad"}, {"id": 2, "full_name": "Alice Good"}]},
+            {"name_to_display": "Пробеги 2 километра меньше чем за 10 минут!", "athletes": [{"id": 3, "full_name": "Bob Bad"}, {"id": 2, "full_name": "Alice Good"}]},
         ]
         return Response(data=data, status=200)
 
