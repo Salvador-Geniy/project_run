@@ -210,11 +210,11 @@ class ChallengesSummaryListView(ListAPIView):
 class ChallengesSummary2(APIView):
 
     def get(self, request, *args, **kwargs):
-        data = [
-            {"name_to_display": "Сделай 10 Забегов!", "athletes": []},
-            {"name_to_display": "Пробеги 50 километров!", "athletes": []},
-            {"name_to_display": "Пробеги 2 километра меньше чем за 10 минут!", "athletes": []},
-        ]
+        # data = [
+        #     {"name_to_display": "Сделай 10 Забегов!", "athletes": []},
+        #     {"name_to_display": "Пробеги 50 километров!", "athletes": []},
+        #     {"name_to_display": "Пробеги 2 километра меньше чем за 10 минут!", "athletes": []},
+        # ]
         # users = list(User.objects.prefetch_related("user_challenge"))
         # for user in users:
         #     for ch in data:
@@ -222,21 +222,33 @@ class ChallengesSummary2(APIView):
         #             ch["athletes"].append({"id": user.id, "full_name": f"{user.first_name} {user.last_name}"})
         # return Response(data=data, status=200)
 
-        challenge_map = {ch["name_to_display"]: ch for ch in data}
+        # challenge_map = {ch["name_to_display"]: ch for ch in data}
+        #
+        # # Efficiently prefetch related data
+        # users = User.objects.prefetch_related(
+        #     Prefetch("user_challenge", to_attr="challenges")
+        # )
+        #
+        # # Process users and challenges
+        # for user in users:
+        #     for challenge in getattr(user, "challenges", []):
+        #         if challenge.full_name in challenge_map:
+        #             challenge_map[challenge.full_name]["athletes"].append({
+        #                 "id": user.id,
+        #                 "full_name": f"{user.first_name} {user.last_name}",
+        #             })
 
-        # Efficiently prefetch related data
-        users = User.objects.prefetch_related(
-            Prefetch("user_challenge", to_attr="challenges")
-        )
-
-        # Process users and challenges
+        challenge_names = Challenge.objects.values_list("full_name", flat=True).distinct()
+        data_map = {name: set() for name in challenge_names}
+        users = User.objects.prefetch_related("user_challenge").filter(is_staff=False)
         for user in users:
-            for challenge in getattr(user, "challenges", []):
-                if challenge.full_name in challenge_map:
-                    challenge_map[challenge.full_name]["athletes"].append({
-                        "id": user.id,
-                        "full_name": f"{user.first_name} {user.last_name}",
-                    })
+            for ch in user.user_challenge.all():
+                if ch.full_name in data_map:
+                    data_map[ch.full_name].add(user)
+
+        data = [{"name_to_display": key, "athletes": [
+            {"id": user.id, "full_name": f"{user.first_name} {user.last_name}"} for user in value
+        ]} for key, value in data_map.items()]
 
         return Response(data=data, status=200)
 
