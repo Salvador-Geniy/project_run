@@ -223,37 +223,3 @@ class ChallengesSummary2(APIView):
         ]} for key, value in data_map.items()]
 
         return Response(data=data, status=200)
-
-
-
-        # data = [
-        #     {"name_to_display": "Сделай 10 Забегов!", "athletes": []},
-        #     {"name_to_display": "Пробеги 50 километров!", "athletes": []},
-        #     {"name_to_display": "Пробеги 2 километра меньше чем за 10 минут!", "athletes": []},
-        # ]
-        # users = list(User.objects.prefetch_related("user_challenge"))
-        # for user in users:
-        #     for ch in data:
-        #         if ch["name_to_display"] in user.user_challenge.values_list("full_name", flat=True):
-        #             ch["athletes"].append({"id": user.id, "full_name": f"{user.first_name} {user.last_name}"})
-        # return Response(data=data, status=200)
-
-        # challenge_map = {ch["name_to_display"]: ch for ch in data}
-        #
-        # # Efficiently prefetch related data
-        # users = User.objects.prefetch_related(
-        #     Prefetch("user_challenge", to_attr="challenges")
-        # )
-        #
-        # # Process users and challenges
-        # for user in users:
-        #     for challenge in getattr(user, "challenges", []):
-        #         if challenge.full_name in challenge_map:
-        #             challenge_map[challenge.full_name]["athletes"].append({
-        #                 "id": user.id,
-        #                 "full_name": f"{user.first_name} {user.last_name}",
-        #             })
-
-
-
-
