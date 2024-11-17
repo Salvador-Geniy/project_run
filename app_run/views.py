@@ -1,4 +1,4 @@
-from django.db.models import Count, Q, Sum
+from django.db.models import Count, Q, Sum, OuterRef, Subquery, Prefetch
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404, CreateAPIView, ListAPIView
@@ -14,6 +14,7 @@ from app_run.serializers import (
     CoachSerializer,
     AthleteSerializer,
     ChallengeSerializer,
+    ChallengesSummaryListSerializer,
 )
 from django.contrib.auth.models import User
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -193,3 +194,19 @@ class ChallengeListView(ListAPIView):
         DjangoFilterBackend,
     ]
     filterset_fields = ["athlete"]
+
+
+class ChallengesSummaryListView(ListAPIView):
+    serializer_class = ChallengesSummaryListSerializer
+    # queryset = Challenge.objects.values("full_name").distinct()
+
+    def get_queryset(self):
+        queryset = Challenge.objects.values("full_name").distinct()
+        res = []
+        for obj in queryset:
+            obj["athletes"] = User.objects.filter(user_challenge__full_name=obj.get("full_name"))
+            res.append(obj)
+        return res
+
+
+

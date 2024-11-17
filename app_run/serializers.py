@@ -11,6 +11,7 @@ from rest_framework.serializers import (
     FloatField,
     DateTimeField,
     PrimaryKeyRelatedField,
+    Serializer,
 )
 from .services import get_distance_speed_from_last_position
 
@@ -159,3 +160,22 @@ class ChallengeSerializer(ModelSerializer):
             "full_name",
             "athlete",
         ]
+
+
+class ChallengeAthleteSerializer(ModelSerializer):
+    full_name = SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "full_name",
+        ]
+
+    def get_full_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}"
+
+
+class ChallengesSummaryListSerializer(Serializer):
+    name_to_display = CharField(source="full_name")
+    athletes = ChallengeAthleteSerializer(many=True)

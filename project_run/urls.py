@@ -28,6 +28,7 @@ from app_run.views import (
     PositionViewSet,
     SubscribeView,
     ChallengeListView,
+    ChallengesSummaryListView,
 )
 
 from rest_framework.routers import SimpleRouter
@@ -44,5 +45,6 @@ urlpatterns = [
     path("api/runs/<int:run_id>/stop/", RunStopView.as_view(), name="run-start"),
     path("api/subscribe_to_coach/<int:id>/", SubscribeView.as_view(), name="subscribe-to-coach"),
     path("api/challenges/", ChallengeListView.as_view(), name="challenge-list"),
+    path("api/challenges_summary/", ChallengesSummaryListView.as_view(), name="challenges-summary"),
     path("", include(router.urls)),
 ]
