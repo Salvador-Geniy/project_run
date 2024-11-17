@@ -29,6 +29,7 @@ from app_run.views import (
     SubscribeView,
     ChallengeListView,
     ChallengesSummaryListView,
+    ChallengesSummary2,
 )
 
 from rest_framework.routers import SimpleRouter
