@@ -212,10 +212,15 @@ class ChallengesSummary2(APIView):
 
     def get(self, request, *args, **kwargs):
         data = [
-            {"name_to_display": "Сделай 10 Забегов!", "athletes": [{"id": 1, "full_name": "Bob Good"}, {"id": 2, "full_name": "Alice Good"}]},
-            {"name_to_display": "Пробеги 50 километров!", "athletes": [{"id": 3, "full_name": "Bob Bad"}, {"id": 2, "full_name": "Alice Good"}]},
-            {"name_to_display": "Пробеги 2 километра меньше чем за 10 минут!", "athletes": [{"id": 3, "full_name": "Bob Bad"}, {"id": 2, "full_name": "Alice Good"}]},
+            {"name_to_display": "Сделай 10 Забегов!", "athletes": []},
+            {"name_to_display": "Пробеги 50 километров!", "athletes": []},
+            {"name_to_display": "Пробеги 2 километра меньше чем за 10 минут!", "athletes": []},
         ]
+        users = User.objects.prefetch_related("user_challenge")
+        for user in users:
+            for ch in data:
+                if ch["name_to_display"] in user.user_challenge.values_list("full_name", flat=True):
+                    ch["athletes"].append({"id": user.id, "full_name": f"{user.first_name} {user.last_name}"})
         return Response(data=data, status=200)
 
 
