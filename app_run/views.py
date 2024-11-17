@@ -202,7 +202,7 @@ class ChallengesSummaryListView(ListAPIView):
         queryset = Challenge.objects.values("full_name").distinct()
         res = []
         for obj in queryset:
-            obj["athletes"] = User.objects.filter(user_challenge__full_name=obj.get("full_name")).distinct()
+            obj["athletes"] = User.objects.filter(user_challenge__full_name=obj.get("full_name"))
             res.append(obj)
         return queryset
 
@@ -210,6 +210,22 @@ class ChallengesSummaryListView(ListAPIView):
 class ChallengesSummary2(APIView):
 
     def get(self, request, *args, **kwargs):
+        challenge_names = Challenge.objects.values_list("full_name", flat=True).distinct()
+        data_map = {name: set() for name in challenge_names}
+        users = User.objects.prefetch_related("user_challenge").filter(is_staff=False)
+        for user in users:
+            for ch in user.user_challenge.all():
+                if ch.full_name in data_map:
+                    data_map[ch.full_name].add(user)
+
+        data = [{"name_to_display": key, "athletes": [
+            {"id": user.id, "full_name": f"{user.first_name} {user.last_name}"} for user in value
+        ]} for key, value in data_map.items()]
+
+        return Response(data=data, status=200)
+
+
+
         # data = [
         #     {"name_to_display": "Сделай 10 Забегов!", "athletes": []},
         #     {"name_to_display": "Пробеги 50 километров!", "athletes": []},
@@ -237,20 +253,6 @@ class ChallengesSummary2(APIView):
         #                 "id": user.id,
         #                 "full_name": f"{user.first_name} {user.last_name}",
         #             })
-
-        challenge_names = Challenge.objects.values_list("full_name", flat=True).distinct()
-        data_map = {name: set() for name in challenge_names}
-        users = User.objects.prefetch_related("user_challenge").filter(is_staff=False)
-        for user in users:
-            for ch in user.user_challenge.all():
-                if ch.full_name in data_map:
-                    data_map[ch.full_name].add(user)
-
-        data = [{"name_to_display": key, "athletes": [
-            {"id": user.id, "full_name": f"{user.first_name} {user.last_name}"} for user in value
-        ]} for key, value in data_map.items()]
-
-        return Response(data=data, status=200)
 
 
 
