@@ -143,7 +143,7 @@ class RunStopView(APIView):
     def check_run_count(athlete):
         finished_run_count = Run.objects.filter(athlete=athlete, status="finished").count()
         if finished_run_count == 10:
-            challenge, _ = Challenge.objects.get_or_create(full_name="Сделай 10 Забегов!", athlete=athlete)
+            Challenge.objects.get_or_create(full_name="Сделай 10 Забегов!", athlete=athlete)
 
 
 class PositionViewSet(ModelViewSet):
