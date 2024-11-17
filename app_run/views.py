@@ -116,8 +116,8 @@ class RunStopView(APIView):
         return Response({"Detail": "Run stopped"}, 200)
 
     def check_run_speed(self, run):
-        if run.run_time_seconds < 600 and run.distance >= 2.0:
-            Challenge.objects.get_or_create(full_name="Пробеги 2 километра меньше чем за 10 минут!", athlete=run.athlete)
+        if run.run_time_seconds < 700 and run.distance >= 2.0:
+            Challenge.objects.create(full_name="Пробеги 2 километра меньше чем за 10 минут!", athlete=run.athlete)
 
     def check_total_distance(self, athlete):
         total_distance = (
@@ -212,9 +212,9 @@ class ChallengesSummary2(ListAPIView):
 
     def get_queryset(self):
         challenges = Challenge.objects.values("full_name").distinct()
-        users = User.objects.filter(is_staff=False)
+        users = User.objects.filter(is_staff=False).prefetch_related("user_challenge")
         for ch in challenges:
-            ch["athletes"] = users.filter(user_challenge__full_name=ch.get("full_name"))
+            ch["athletes"] = users.filter(user_challenge__full_name=ch.get("full_name")).distinct()
         return challenges
 
 
