@@ -229,6 +229,7 @@ class CityListView(APIView):
     def get(self, request, *args, **kwargs):
         runs = Run.objects.prefetch_related("position_set").order_by("-id")
         positions = [pos for run in runs for pos in run.position_set.all()[:1] if run.position_set.all()]
-        cities = get_cities_for_positions(positions)
+        # cities = get_cities_for_positions(positions)
+        cities = ["Hello"]
         return Response(cities, status=200)
 
