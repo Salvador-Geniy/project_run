@@ -1,4 +1,4 @@
-from django.conf import settings
+from project_run.settings import base
 from geopy.distance import geodesic
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 from .models import Position
@@ -68,7 +68,7 @@ def get_average_speed(positions: QuerySet["Position"]) -> float:
 
 def get_cities_for_positions(positions):
     result = []
-    cities_file = settings.CITIES_FILE
+    cities_file = base.CITIES_FILE
     try:
         # Загружаем файл с городами
         cities = gpd.read_file(cities_file)
