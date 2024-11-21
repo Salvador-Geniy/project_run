@@ -2,11 +2,10 @@ import os
 from django.conf import settings
 
 from geopy.distance import geodesic
-from shapely import Point
 
 from .models import Position
 from django.db.models import Min, Max, QuerySet, Avg
-import geopandas as gpd
+import reverse_geocoder as rg
 
 
 def get_distance(positions: list[Position]) -> float:
@@ -70,33 +69,35 @@ def get_average_speed(positions: QuerySet["Position"]) -> float:
 
 def get_cities_for_positions(positions):
     result = []
-    cities_file = os.path.join(settings.BASE_DIR, "app_run", "ne_10m_populated_places/ne_10m_populated_places.shp")
+    # cities_file = os.path.join(settings.BASE_DIR, "app_run", "ne_10m_populated_places/ne_10m_populated_places.shp")
     try:
         # Загружаем файл с городами
-        cities = gpd.read_file(cities_file)
-
-        # Проверяем текущую систему координат
-        if cities.crs is None:
-            raise ValueError("CRS не определена в файле .shp. Проверьте файл.")
+        # cities = gpd.read_file(cities_file)
+        #
+        # # Проверяем текущую систему координат
+        # if cities.crs is None:
+        #     raise ValueError("CRS не определена в файле .shp. Проверьте файл.")
+        # for position in positions:
+        #     latitude, longitude = position.latitude, position.longitude
+        #
+        #     # Создаем точку из координат
+        #     point = gpd.GeoSeries([Point(float(longitude), float(latitude))], crs="EPSG:4326")
+        #
+        #     # Преобразуем обе геометрии в проекционную систему координат
+        #     cities = cities.to_crs(epsg=3857)  # Преобразуем в метрическую систему
+        #     point = point.to_crs(epsg=3857)
+        #
+        #     # Вычисляем расстояние от точки до всех городов
+        #     cities["distance"] = cities.geometry.distance(point.iloc[0], align=False)
+        #
+        #     # Находим ближайший город
+        #     nearest_city = cities.sort_values("distance").iloc[0]
+        #
+        #     # Получаем название города
+        #     city_name = nearest_city.get("NAME", None)
         for position in positions:
-            latitude, longitude = position.latitude, position.longitude
-
-            # Создаем точку из координат
-            point = gpd.GeoSeries([Point(float(longitude), float(latitude))], crs="EPSG:4326")
-
-            # Преобразуем обе геометрии в проекционную систему координат
-            cities = cities.to_crs(epsg=3857)  # Преобразуем в метрическую систему
-            point = point.to_crs(epsg=3857)
-
-            # Вычисляем расстояние от точки до всех городов
-            cities["distance"] = cities.geometry.distance(point.iloc[0], align=False)
-
-            # Находим ближайший город
-            nearest_city = cities.sort_values("distance").iloc[0]
-
-            # Получаем название города
-            city_name = nearest_city.get("NAME", None)
-
+            response = rg.search((position.latitude, position.longitude))
+            city_name = response[0]['name']
             if city_name:
                 result.append(city_name)
 
