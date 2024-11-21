@@ -1,4 +1,4 @@
-from django.db.models import Count, Q, Sum, OuterRef, Subquery, Prefetch
+from django.db.models import Count, Q, Sum
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404, CreateAPIView, ListAPIView
@@ -20,7 +20,6 @@ from django.contrib.auth.models import User
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .services import get_distance, get_run_time_seconds, get_average_speed
 from django_filters.rest_framework import DjangoFilterBackend
-import time
 
 
 @api_view(["GET"])

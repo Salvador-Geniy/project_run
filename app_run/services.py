@@ -1,10 +1,6 @@
 from geopy.distance import geodesic
 from .models import Position
 from django.db.models import Min, Max, QuerySet, Avg
-# import geopandas as gpd
-# from shapely.geometry import Point
-# import os
-# from django.conf import settings
 
 
 def get_distance(positions: list[Position]) -> float:
