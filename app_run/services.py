@@ -3,6 +3,8 @@ from .models import Position
 from django.db.models import Min, Max, QuerySet, Avg
 import geopandas as gpd
 from shapely.geometry import Point
+import os
+from django.conf import settings
 
 
 def get_distance(positions: list[Position]) -> float:
@@ -66,10 +68,12 @@ def get_average_speed(positions: QuerySet["Position"]) -> float:
 
 def get_cities_for_positions(positions):
     result = []
-    cities_file = "ne_10m_populated_places/ne_10m_populated_places.shp"
+    cities_file = os.path.join(settings.BASE_DIR, "app_run", "ne_10m_populated_places/ne_10m_populated_places.shp")
+
     try:
         # Загружаем файл с городами
         cities = gpd.read_file(cities_file)
+
         # Проверяем текущую систему координат
         if cities.crs is None:
             raise ValueError("CRS не определена в файле .shp. Проверьте файл.")
@@ -95,8 +99,8 @@ def get_cities_for_positions(positions):
             if city_name:
                 result.append(city_name)
 
-    except Exception:
-        pass
+    except Exception as e:
+        print(e)
 
     return result
 
