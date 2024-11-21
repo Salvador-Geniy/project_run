@@ -18,8 +18,9 @@ from app_run.serializers import (
 )
 from django.contrib.auth.models import User
 from rest_framework.filters import SearchFilter, OrderingFilter
-from .services import get_distance, get_run_time_seconds, get_average_speed
+from .services import get_distance, get_run_time_seconds, get_average_speed, get_cities_for_positions
 from django_filters.rest_framework import DjangoFilterBackend
+import time
 
 
 @api_view(["GET"])
@@ -222,3 +223,12 @@ class ChallengesSummary2(APIView):
         ]} for key, value in data_map.items()]
 
         return Response(data=data, status=200)
+
+
+class CityListView(APIView):
+    def get(self, request, *args, **kwargs):
+        runs = Run.objects.prefetch_related("position_set").order_by("-id")
+        positions = [pos for run in runs for pos in run.position_set.all()[:1] if run.position_set.all()]
+        cities = get_cities_for_positions(positions)
+        return Response(cities, status=200)
+

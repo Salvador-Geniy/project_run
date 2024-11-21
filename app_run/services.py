@@ -1,6 +1,10 @@
+from django.conf import settings
 from geopy.distance import geodesic
+from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 from .models import Position
 from django.db.models import Min, Max, QuerySet, Avg
+import geopandas as gpd
+from shapely.geometry import Point
 
 
 def get_distance(positions: list[Position]) -> float:
@@ -60,3 +64,41 @@ def get_average_speed(positions: QuerySet["Position"]) -> float:
         return 0
     avg_speed = positions.aggregate(avg_speed=Avg("speed")).get("avg_speed")
     return round(avg_speed, 2)
+
+
+def get_cities_for_positions(positions):
+    result = []
+    cities_file = settings.CITIES_FILE
+    try:
+        # Загружаем файл с городами
+        cities = gpd.read_file(cities_file)
+        # Проверяем текущую систему координат
+        if cities.crs is None:
+            raise ValueError("CRS не определена в файле .shp. Проверьте файл.")
+        for position in positions:
+            latitude, longitude = position.latitude, position.longitude
+
+            # Создаем точку из координат
+            point = gpd.GeoSeries([Point(float(longitude), float(latitude))], crs="EPSG:4326")
+
+            # Преобразуем обе геометрии в проекционную систему координат
+            cities = cities.to_crs(epsg=3857)  # Преобразуем в метрическую систему
+            point = point.to_crs(epsg=3857)
+
+            # Вычисляем расстояние от точки до всех городов
+            cities["distance"] = cities.geometry.distance(point.iloc[0], align=False)
+
+            # Находим ближайший город
+            nearest_city = cities.sort_values("distance").iloc[0]
+
+            # Получаем название города
+            city_name = nearest_city.get("NAME", None)
+
+            if city_name:
+                result.append(city_name)
+
+    except Exception:
+        pass
+
+    return result
+

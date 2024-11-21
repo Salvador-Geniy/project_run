@@ -33,7 +33,7 @@ class Run(models.Model):
     speed = models.FloatField(default=0, verbose_name="средняя скорость в м/с")
 
     def __str__(self):
-        return f"{self.athlete.username}, {self.get_status_display()}"
+        return f"{self.id} {self.athlete.username}, {self.get_status_display()}"
 
     class Meta:
         verbose_name = "забег"
