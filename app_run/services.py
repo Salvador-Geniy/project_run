@@ -2,7 +2,7 @@ from geopy.distance import geodesic
 
 from .models import Position
 from django.db.models import Min, Max, QuerySet, Avg
-import reverse_geocoder as rg
+# import reverse_geocoder as rg
 
 
 def get_distance(positions: list[Position]) -> float:
@@ -66,15 +66,15 @@ def get_average_speed(positions: QuerySet["Position"]) -> float:
 
 def get_cities_for_positions(positions):
     result = []
-    try:
-        for position in positions:
-            response = rg.search((position.latitude, position.longitude))
-            city_name = response[0]['name']
-            if city_name:
-                result.append(city_name)
-
-    except Exception as e:
-        print(e)
+    # try:
+    #     for position in positions:
+    #         response = rg.search((position.latitude, position.longitude))
+    #         city_name = response[0].get("name")
+    #         if city_name:
+    #             result.append(city_name)
+    #
+    # except Exception as e:
+    #     print(e)
 
     return result
 
