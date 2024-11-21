@@ -1,6 +1,4 @@
-from project_run.settings import base
 from geopy.distance import geodesic
-from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 from .models import Position
 from django.db.models import Min, Max, QuerySet, Avg
 import geopandas as gpd
@@ -68,7 +66,7 @@ def get_average_speed(positions: QuerySet["Position"]) -> float:
 
 def get_cities_for_positions(positions):
     result = []
-    cities_file = base.CITIES_FILE
+    cities_file = "ne_10m_populated_places/ne_10m_populated_places.shp"
     try:
         # Загружаем файл с городами
         cities = gpd.read_file(cities_file)

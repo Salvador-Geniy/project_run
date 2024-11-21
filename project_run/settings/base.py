@@ -117,5 +117,3 @@ STATIC_ROOT = 'static'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-CITIES_FILE = os.path.join(BASE_DIR, "static", "ne_10m_populated_places", "ne_10m_populated_places.shp")
