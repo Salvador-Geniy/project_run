@@ -233,25 +233,21 @@ class CoachAnalytics(APIView):
         data["longest_run_user"] = longest_run.athlete_id
         data["longest_run_value"] = longest_run.distance
 
-        longest_total_distance = (
+        users = (
             User.objects
             .filter(pk__in=athletes)
             .prefetch_related("user_run")
             .annotate(total_dist=Sum("user_run__distance"))
-            .order_by("-total_dist")
-            .first()
+            .annotate(avg_speed=Avg("user_run__speed", default=0))
         )
+
+        longest_total_distance = users.order_by("-total_dist").first()
         data["total_run_user"] = longest_total_distance.id
         data["total_run_value"] = longest_total_distance.total_dist
 
-        avg_speed = (
-            User.objects
-            .filter(pk__in=athletes)
-            .prefetch_related("user_run")
-            .annotate(avg_speed=Avg("user_run__speed", default=0))
-        ).order_by("-avg_speed")
-        data["speed_avg_user"] = avg_speed.first().id
-        data["speed_avg_value"] = avg_speed.first().avg_speed
+        avg_speed = users.order_by("-avg_speed").first()
+        data["speed_avg_user"] = avg_speed.id
+        data["speed_avg_value"] = avg_speed.avg_speed
 
         return JsonResponse(data, status=200)
 
