@@ -17,17 +17,20 @@ class RunAdmin(ModelAdmin):
         "status",
         "distance",
         "run_time_seconds",
+        "speed",
         "created_at",
     )
 
     fields = (
         "athlete",
         "comment",
+        "speed",
+        "distance",
     )
 
     def get_fields(self, request, obj=None):
         if obj:
-            return ("comment", "status")
+            return ["comment", "status", "speed", "distance"]
         return self.fields
 
 

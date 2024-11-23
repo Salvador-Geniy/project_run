@@ -1,11 +1,12 @@
-from django.db.models import Count, Q, Sum
+from django.db.models import Count, Q, Sum, Avg
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404, CreateAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from app_run.models import Run, Position, Challenge
+from app_run.models import Run, Position, Challenge, Subscribe
 from app_run.serializers import (
     RunSerializer,
     UserSerializer,
@@ -224,10 +225,34 @@ class ChallengesSummary2(APIView):
         return Response(data=data, status=200)
 
 
-class CityListView(APIView):
-    def get(self, request, *args, **kwargs):
-        runs = Run.objects.prefetch_related("position_set").order_by("-id")
-        positions = [pos for run in runs for pos in run.position_set.all()[:1] if run.position_set.all()]
-        cities = get_cities_for_positions(positions)
-        return Response(cities, status=200)
+class CoachAnalytics(APIView):
+    def get(self, request, coach_id, *args, **kwargs):
+        athletes = Subscribe.objects.filter(coach_id=coach_id).values_list("athlete_id", flat=True)
+        data = dict()
+
+        longest_run = Run.objects.filter(athlete_id__in=athletes).order_by("-distance").first()
+        data["longest_run_user"] = longest_run.athlete_id
+        data["longest_run_value"] = longest_run.distance
+
+        longest_total_distance = (
+            User.objects
+            .filter(pk__in=athletes)
+            .prefetch_related("user_run")
+            .annotate(total_dist=Sum("user_run__distance"))
+            .order_by("-total_dist")
+            .first()
+        )
+        data["total_run_user"] = longest_total_distance.id
+        data["total_run_value"] = longest_total_distance.total_dist
+
+        avg_speed = (
+            User.objects
+            .filter(pk__in=athletes)
+            .prefetch_related("user_run")
+            .annotate(avg_speed=Avg("user_run__speed", default=0))
+        ).order_by("-avg_speed")
+        data["speed_avg_user"] = avg_speed.first().id
+        data["speed_avg_value"] = avg_speed.first().avg_speed
+
+        return JsonResponse(data, status=200)
 
