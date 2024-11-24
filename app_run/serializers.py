@@ -1,4 +1,5 @@
 import datetime
+import random
 
 from django.contrib.auth.models import User
 from app_run.models import Run, Position, Subscribe, Challenge
@@ -179,3 +180,31 @@ class ChallengeAthleteSerializer(ModelSerializer):
 class ChallengesSummaryListSerializer(Serializer):
     name_to_display = CharField(source="full_name")
     athletes = ChallengeAthleteSerializer(many=True)
+
+
+CITIES = [
+    "New York",
+    "Paris",
+    "Maiami",
+    "Toronto",
+    "San Francisco",
+    "Los Angeles",
+    "Buenos Aires",
+    "Tokio",
+    "Kioto"
+]
+
+
+class TestPositionSerializer(ModelSerializer):
+    point = SerializerMethodField(read_only=True)
+    city = SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Position
+        fields = ["point", "city"]
+
+    def get_point(self, obj) -> str:
+        return f"({obj.latitude}, {obj.longitude})"
+
+    def get_city(self, obj):
+        return random.choice(CITIES)
