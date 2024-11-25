@@ -31,7 +31,6 @@ from app_run.views import (
     ChallengesSummaryListView,
     ChallengesSummary2,
     CoachAnalytics,
-    TestPositionView,
 )
 
 from rest_framework.routers import SimpleRouter

@@ -16,7 +16,6 @@ from app_run.serializers import (
     AthleteSerializer,
     ChallengeSerializer,
     ChallengesSummaryListSerializer,
-    TestPositionSerializer,
 )
 from django.contrib.auth.models import User
 from rest_framework.filters import SearchFilter, OrderingFilter
