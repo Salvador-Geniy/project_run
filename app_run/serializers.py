@@ -194,17 +194,3 @@ CITIES = [
     "Kioto"
 ]
 
-
-class TestPositionSerializer(ModelSerializer):
-    point = SerializerMethodField(read_only=True)
-    city = SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = Position
-        fields = ["point", "city"]
-
-    def get_point(self, obj) -> str:
-        return f"({obj.latitude}, {obj.longitude})"
-
-    def get_city(self, obj):
-        return random.choice(CITIES)

@@ -253,7 +253,3 @@ class CoachAnalytics(APIView):
         return JsonResponse(data, status=200)
 
 
-class TestPositionView(ListAPIView):
-    queryset = Position.objects.all()
-    serializer_class = TestPositionSerializer
-
