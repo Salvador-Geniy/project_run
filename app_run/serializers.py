@@ -13,6 +13,7 @@ from rest_framework.serializers import (
     DateTimeField,
     PrimaryKeyRelatedField,
     Serializer,
+    FileField,
 )
 from .services import get_distance_speed_from_last_position
 
@@ -194,3 +195,6 @@ CITIES = [
     "Kioto"
 ]
 
+
+class UploadFileSerializer(Serializer):
+    file = FileField()

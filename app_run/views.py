@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404, CreateAPIView, ListAPIView
+from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
@@ -16,11 +17,13 @@ from app_run.serializers import (
     AthleteSerializer,
     ChallengeSerializer,
     ChallengesSummaryListSerializer,
+    UploadFileSerializer,
 )
 from django.contrib.auth.models import User
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .services import get_distance, get_run_time_seconds, get_average_speed, get_cities_for_positions
 from django_filters.rest_framework import DjangoFilterBackend
+import openpyxl
 
 
 @api_view(["GET"])
@@ -252,3 +255,31 @@ class CoachAnalytics(APIView):
         return JsonResponse(data, status=200)
 
 
+class UploadFileView(APIView):
+    parser_classes = [MultiPartParser]
+    serializer_class = UploadFileSerializer
+
+    def post(self, request, *args, **kwargs):
+        rows = []
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            validated_data = serializer.validated_data
+            file = validated_data["file"]
+            content_type = validated_data["file"].content_type
+            if content_type != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                return Response("Wrong content type", 400)
+
+            rows = self.get_rows(file)
+        return Response(rows, 200)
+
+    def get_rows(self, file):
+        rows = []
+        sheet = openpyxl.load_workbook(file)
+        sheet = sheet.active
+        for i, row in enumerate(sheet.iter_rows(values_only=True)):
+            if i == 0:
+                continue
+            row_list = list(row)
+            if row_list and len(row_list) == 8 and isinstance(row_list[0], int):
+                rows.append(row_list)
+        return rows

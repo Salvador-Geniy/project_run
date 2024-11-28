@@ -2,6 +2,7 @@ from geopy.distance import geodesic
 
 from .models import Position
 from django.db.models import Min, Max, QuerySet, Avg
+import openpyxl
 # import reverse_geocoder as rg
 
 
@@ -77,4 +78,3 @@ def get_cities_for_positions(positions):
     #     print(e)
 
     return result
-
