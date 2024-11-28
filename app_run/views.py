@@ -23,7 +23,8 @@ from django.contrib.auth.models import User
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .services import get_distance, get_run_time_seconds, get_average_speed, get_cities_for_positions
 from django_filters.rest_framework import DjangoFilterBackend
-import openpyxl
+
+import csv
 
 
 @api_view(["GET"])
@@ -266,20 +267,20 @@ class UploadFileView(APIView):
             validated_data = serializer.validated_data
             file = validated_data["file"]
             content_type = validated_data["file"].content_type
-            if content_type != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+            if content_type != "text/csv":
                 return Response("Wrong content type", 400)
 
             rows = self.get_rows(file)
         return Response(rows, 200)
 
-    def get_rows(self, file):
+    def get_rows(self, income):
         rows = []
-        sheet = openpyxl.load_workbook(file)
-        sheet = sheet.active
-        for i, row in enumerate(sheet.iter_rows(values_only=True)):
-            if i == 0:
-                continue
-            row_list = list(row)
-            if row_list and len(row_list) == 8 and isinstance(row_list[0], int):
-                rows.append(row_list)
-        return rows
+        decoded_file = income.read().decode('utf-8')
+        decoded_file = decoded_file.replace(';', ',')
+        csv_reader = csv.reader(decoded_file.splitlines())
+
+        for row in csv_reader:
+            if row:
+                row = [i for i in row if len(i) > 0]
+                rows.append(row)
+        return rows[1:]
