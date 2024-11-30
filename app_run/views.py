@@ -279,8 +279,10 @@ class UploadFileView(APIView):
         decoded_file = decoded_file.replace(';', ',')
         csv_reader = csv.reader(decoded_file.splitlines())
 
-        for row in csv_reader:
+        for i, row in enumerate(csv_reader):
+            if i == 0:
+                continue
             if row:
-                row = [i for i in row if len(i) > 0]
+                row = [i for i in row if i]
                 rows.append(row)
-        return rows[1:]
+        return rows
