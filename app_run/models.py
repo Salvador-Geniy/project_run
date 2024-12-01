@@ -90,3 +90,21 @@ class Challenge(models.Model):
     class Meta:
         verbose_name = "челлендж"
         verbose_name_plural = "челленджи"
+
+
+class UnitLocation(models.Model):
+    name = models.CharField(max_length=50)
+    latitude = models.FloatField(
+        validators=[MinValueValidator(-90.0), MaxValueValidator(90.0)],
+        verbose_name="широта"
+    )
+    longitude = models.FloatField(
+        validators=[MinValueValidator(-180.0), MaxValueValidator(180.0)],
+        verbose_name="долгота"
+    )
+    picture = models.URLField()
+    value = models.PositiveSmallIntegerField()
+
+    class Meta:
+        verbose_name = "коллекционный предмет"
+        verbose_name_plural = "коллекционные предметы"

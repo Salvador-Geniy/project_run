@@ -2,7 +2,7 @@ import datetime
 import random
 
 from django.contrib.auth.models import User
-from app_run.models import Run, Position, Subscribe, Challenge
+from app_run.models import Run, Position, Subscribe, Challenge, UnitLocation
 from rest_framework.serializers import (
     ModelSerializer,
     SerializerMethodField,
@@ -198,3 +198,16 @@ CITIES = [
 
 class UploadFileSerializer(Serializer):
     file = FileField()
+
+
+class UnitLocationSerializer(ModelSerializer):
+    class Meta:
+        model = UnitLocation
+        fields = [
+            "id",
+            "name",
+            "latitude",
+            "longitude",
+            "picture",
+            "value"
+        ]

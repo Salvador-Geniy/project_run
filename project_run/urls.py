@@ -32,6 +32,7 @@ from app_run.views import (
     ChallengesSummary2,
     CoachAnalytics,
     UploadFileView,
+    UnitLocationListView,
 )
 
 from rest_framework.routers import SimpleRouter
@@ -49,7 +50,8 @@ urlpatterns = [
     path("api/subscribe_to_coach/<int:id>/", SubscribeView.as_view(), name="subscribe-to-coach"),
     path("api/challenges/", ChallengeListView.as_view(), name="challenge-list"),
     path("api/challenges_summary/", ChallengesSummary2.as_view(), name="challenges-summary"),
-    path("api/analytics_for_coach/<int:coach_id>/", CoachAnalytics.as_view(), name="coach-analitics"),
-    path("api/upload/", UploadFileView.as_view(), name="upload-file"),
+    path("api/analytics_for_coach/<int:coach_id>/", CoachAnalytics.as_view(), name="coach-analytics"),
+    # path("api/upload/", UploadFileView.as_view(), name="upload-file"),
+    # path("api/unit-location/", UnitLocationListView.as_view(), name="unit-location"),
     path("", include(router.urls)),
 ]

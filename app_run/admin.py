@@ -70,3 +70,8 @@ class ChallengeAdmin(ModelAdmin):
         "full_name",
         "athlete",
     ]
+
+
+@admin.register(models.UnitLocation)
+class UnitLocationAdmin(admin.ModelAdmin):
+    pass

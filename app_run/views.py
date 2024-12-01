@@ -7,7 +7,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from app_run.models import Run, Position, Challenge, Subscribe
+from app_run.models import Run, Position, Challenge, Subscribe, UnitLocation
 from app_run.serializers import (
     RunSerializer,
     UserSerializer,
@@ -18,14 +18,14 @@ from app_run.serializers import (
     ChallengeSerializer,
     ChallengesSummaryListSerializer,
     UploadFileSerializer,
+    UnitLocationSerializer,
 )
 from django.contrib.auth.models import User
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .services import get_distance, get_run_time_seconds, get_average_speed, get_cities_for_positions
 from django_filters.rest_framework import DjangoFilterBackend
-
-import csv
-
+import openpyxl
+import re
 
 @api_view(["GET"])
 def get_club_data(request):
@@ -261,28 +261,57 @@ class UploadFileView(APIView):
     serializer_class = UploadFileSerializer
 
     def post(self, request, *args, **kwargs):
-        rows = []
+        wrong_rows = []
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             validated_data = serializer.validated_data
             file = validated_data["file"]
             content_type = validated_data["file"].content_type
-            if content_type != "text/csv":
+            if content_type != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
                 return Response("Wrong content type", 400)
 
-            rows = self.get_rows(file)
-        return Response(rows, 200)
+            wrong_rows = self.get_rows(file)
+        return Response(wrong_rows, 200)
 
-    def get_rows(self, income):
-        rows = []
-        decoded_file = income.read().decode('utf-8')
-        decoded_file = decoded_file.replace(';', ',')
-        csv_reader = csv.reader(decoded_file.splitlines())
-
-        for i, row in enumerate(csv_reader):
+    def get_rows(self, file):
+        wrong_rows = []
+        sheet = openpyxl.load_workbook(file)
+        sheet = sheet.active
+        for i, row in enumerate(sheet.iter_rows(values_only=True)):
             if i == 0:
                 continue
-            if row:
-                row = [i for i in row if i]
-                rows.append(row)
-        return rows
+            wrong_row = self.get_unit(row)
+            if wrong_row:
+                wrong_rows.append(wrong_row)
+        return wrong_rows
+
+    def check_position(self, lat, lon) -> bool:
+        return (-90.0 <= lat <= 90.0) and (-180.0 <= lon <= 180.0)
+
+    def get_unit(self, row):
+        try:
+            if not self.check_url(row[4]) or not self.check_position(row[0], row[1]):
+                raise ValueError
+            UnitLocation.objects.create(
+                name=row[2],
+                latitude=row[0],
+                longitude=row[1],
+                picture=row[4],
+                value=row[3]
+            )
+        except ValueError:
+            return row
+
+    @staticmethod
+    def check_url(url: str) -> bool:
+        pattern = r"^(https?):\/\/[^\s/$.?#].[^\s]*$"
+        if re.match(pattern, url):
+            return True
+        return False
+
+
+class UnitLocationListView(ListAPIView):
+    queryset = UnitLocation.objects.all()
+    serializer_class = UnitLocationSerializer
+
+
