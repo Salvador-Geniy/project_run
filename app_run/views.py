@@ -283,7 +283,6 @@ class UploadFileView(APIView):
                 continue
             wrong_row = self.get_unit(row)
             if wrong_row:
-                print(wrong_row)
                 wrong_rows.append(list(wrong_row))
         return wrong_rows
 
