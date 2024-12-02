@@ -321,7 +321,7 @@ class UploadFileView(APIView):
 
     @staticmethod
     def check_url(url: str) -> bool:
-        pattern = r"^(https?):\/\/[^\s/$.?#].[^\s]*$"
+        pattern = r"^(https?):\/\/([a-zA-Z0-9-]+\.[a-zA-Z]{2,})(\/[^\s]*)?$"
         if re.match(pattern, url):
             return True
         return False
