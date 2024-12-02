@@ -271,7 +271,7 @@ class UploadFileView(APIView):
                 return Response("Wrong content type", 400)
 
             wrong_rows = self.get_rows(file)
-        return JsonResponse(wrong_rows, safe=False, status=status.HTTP_200_OK)
+        return Response(wrong_rows, status=status.HTTP_200_OK)
 
     def get_rows(self, file):
         wrong_rows = []
