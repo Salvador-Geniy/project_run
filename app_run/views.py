@@ -271,7 +271,7 @@ class UploadFileView(APIView):
                 return Response("Wrong content type", 400)
 
             wrong_rows = self.get_rows(file)
-        return JsonResponse(wrong_rows, status=status.HTTP_200_OK)
+        return JsonResponse(wrong_rows, safe=False, status=status.HTTP_200_OK)
         # return Response("wer", 200)
 
     def get_rows(self, file):
@@ -283,7 +283,8 @@ class UploadFileView(APIView):
                 continue
             wrong_row = self.get_unit(row)
             if wrong_row:
-                wrong_rows.append(wrong_row)
+                print(wrong_row)
+                wrong_rows.append(list(wrong_row))
         return wrong_rows
 
     def check_position(self, lat, lon) -> bool:
