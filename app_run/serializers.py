@@ -206,7 +206,7 @@ class UnitLocationSerializer(ModelSerializer):
         fields = [
             "id",
             "name",
-            # "latitude",
+            "latitude",
             # "longitude",
             # "picture",
             # "value"
