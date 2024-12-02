@@ -295,16 +295,28 @@ class UploadFileView(APIView):
         except Exception:
             return False
 
+    def check_level(self, level):
+        try:
+            int(level)
+            return True
+        except Exception:
+            return False
+
+    def check_name(self, name):
+        if not name or not isinstance(name, str):
+            return False
+        return True
+
     def get_unit(self, row):
         try:
-            if not self.check_url(row[4]) or not self.check_position(row[2], row[3]):
+            if not self.check_url(row[4]) or not self.check_position(row[2], row[3]) or not self.check_level(row[1]) or not self.check_name(row[0]):
                 raise ValueError
             UnitLocation.objects.create(
-                name=row[2],
-                latitude=row[0],
-                longitude=row[1],
+                name=row[0],
+                latitude=row[2],
+                longitude=row[3],
                 picture=row[4],
-                value=row[3]
+                value=row[1]
             )
         except ValueError:
             return row
