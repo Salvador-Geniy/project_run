@@ -271,8 +271,8 @@ class UploadFileView(APIView):
                 return Response("Wrong content type", 400)
 
             wrong_rows = self.get_rows(file)
-        # return Response(wrong_rows, 200)
-        return Response("wer", 200)
+        return Response(wrong_rows, 200)
+        # return Response("wer", 200)
 
     def get_rows(self, file):
         wrong_rows = []
@@ -287,11 +287,16 @@ class UploadFileView(APIView):
         return wrong_rows
 
     def check_position(self, lat, lon) -> bool:
-        return (-90.0 <= lat <= 90.0) and (-180.0 <= lon <= 180.0)
+        try:
+            lat = float(lat)
+            lon = float(lon)
+            return (-90.0 <= lat <= 90.0) and (-180.0 <= lon <= 180.0)
+        except Exception:
+            return False
 
     def get_unit(self, row):
         try:
-            if not self.check_url(row[4]) or not self.check_position(row[0], row[1]):
+            if not self.check_url(row[4]) or not self.check_position(row[2], row[3]):
                 raise ValueError
             UnitLocation.objects.create(
                 name=row[2],
