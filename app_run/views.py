@@ -312,8 +312,8 @@ class UploadFileView(APIView):
             UnitLocation.objects.create(
                 name=row[0],
                 uid=row[1],
-                latitude=row[3],
-                longitude=row[4],
+                latitude=row[4],
+                longitude=row[3],
                 picture=row[5],
                 value=row[2]
             )
