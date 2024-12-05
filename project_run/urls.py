@@ -52,6 +52,6 @@ urlpatterns = [
     path("api/challenges_summary/", ChallengesSummary2.as_view(), name="challenges-summary"),
     path("api/analytics_for_coach/<int:coach_id>/", CoachAnalytics.as_view(), name="coach-analytics"),
     path("api/upload_file/", UploadFileView.as_view(), name="upload-file"),
-    path("api/unit_location/", UnitLocationListView.as_view(), name="unit-location"),
+    path("api/collectible_item/", UnitLocationListView.as_view(), name="unit-location"),
     path("", include(router.urls)),
 ]
