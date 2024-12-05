@@ -94,6 +94,7 @@ class Challenge(models.Model):
 
 class UnitLocation(models.Model):
     name = models.CharField(max_length=50)
+    uid = models.CharField(max_length=8)
     latitude = models.FloatField(
         validators=[MinValueValidator(-90.0), MaxValueValidator(90.0)],
         verbose_name="широта"

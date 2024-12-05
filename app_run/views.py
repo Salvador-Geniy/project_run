@@ -307,21 +307,23 @@ class UploadFileView(APIView):
 
     def get_unit(self, row):
         try:
-            if not self.check_url(row[4]) or not self.check_position(row[2], row[3]) or not self.check_level(row[1]) or not self.check_name(row[0]):
+            if not self.check_url(row[5]) or not self.check_position(row[3], row[4]) or not self.check_level(row[2]) or not self.check_name(row[0]):
                 raise ValueError
             UnitLocation.objects.create(
                 name=row[0],
-                latitude=row[2],
-                longitude=row[3],
-                picture=row[4],
-                value=row[1]
+                uid=row[1],
+                latitude=row[3],
+                longitude=row[4],
+                picture=row[5],
+                value=row[2]
             )
         except ValueError:
+            print(f"Wrong: {row}")
             return row
 
     @staticmethod
     def check_url(url: str) -> bool:
-        pattern = r"^(https?):\/\/([a-zA-Z0-9-]+\.[a-zA-Z]{2,})(\/[^\s]*)?$"
+        pattern = r"^(https?):\/\/([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$"
         if re.match(pattern, url):
             return True
         return False
