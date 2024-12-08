@@ -22,7 +22,7 @@ from app_run.serializers import (
 )
 from django.contrib.auth.models import User
 from rest_framework.filters import SearchFilter, OrderingFilter
-from .services import get_distance, get_run_time_seconds, get_average_speed, get_cities_for_positions
+from .services import get_distance, get_run_time_seconds, get_average_speed
 from django_filters.rest_framework import DjangoFilterBackend
 import openpyxl
 import re
