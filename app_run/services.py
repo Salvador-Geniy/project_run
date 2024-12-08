@@ -82,8 +82,6 @@ def check_unit_locations(position):
     units_for_create = []
     units = list(UnitLocation.objects.all())
     for unit in units:
-        print(f"Unit: {unit.latitude}, {unit.longitude}")
-        print(f"position:{position.latitude}, {position.longitude}")
         dist = geodesic((position.latitude, position.longitude), (unit.latitude, unit.longitude)).meters
         if dist <= 100:
             units_for_create.append(unit)
