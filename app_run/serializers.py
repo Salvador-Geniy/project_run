@@ -107,7 +107,7 @@ class AthleteSerializer(UserSerializer):
 class PositionSerializer(ModelSerializer):
     latitude = FloatField(min_value=-90.0, max_value=90.0)
     longitude = FloatField(min_value=-180.0, max_value=180.0)
-    date_time = DateTimeField(format="%Y-%m-%dT%H:%M:%S.%f")
+    date_time = DateTimeField(format="%Y-%m-%dT%H:%M:%S.%f", required=False)
     speed = FloatField(read_only=True)
     distance = FloatField(read_only=True)
 
