@@ -109,3 +109,15 @@ class UnitLocation(models.Model):
     class Meta:
         verbose_name = "коллекционный предмет"
         verbose_name_plural = "коллекционные предметы"
+
+
+class UnitAthlete(models.Model):
+    athlete = models.ForeignKey(User, on_delete=models.CASCADE, related_name="uathlete")
+    unit = models.ForeignKey(UnitLocation, on_delete=models.CASCADE, related_name="aunit")
+
+    class Meta:
+        verbose_name = "награда бегуна"
+        verbose_name_plural = "награды бегуна"
+
+    def __str__(self):
+        return f"{self.athlete} {self.unit}"

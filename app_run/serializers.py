@@ -2,7 +2,7 @@ import datetime
 import random
 
 from django.contrib.auth.models import User
-from app_run.models import Run, Position, Subscribe, Challenge, UnitLocation
+from app_run.models import Run, Position, Subscribe, Challenge, UnitLocation, UnitAthlete
 from rest_framework.serializers import (
     ModelSerializer,
     SerializerMethodField,
@@ -15,7 +15,7 @@ from rest_framework.serializers import (
     Serializer,
     FileField,
 )
-from .services import get_distance_speed_from_last_position
+from .services import get_distance_speed_from_last_position, check_unit_locations
 
 
 class UserDataSerializer(ModelSerializer):
@@ -54,6 +54,7 @@ class RunSerializer(ModelSerializer):
 class UserSerializer(ModelSerializer):
     type = SerializerMethodField()
     runs_finished = IntegerField(read_only=True)
+    items = SerializerMethodField()
 
     class Meta:
         model = User
@@ -64,6 +65,7 @@ class UserSerializer(ModelSerializer):
             "first_name",
             "type",
             "runs_finished",
+            "items",
         ]
 
     def get_type(self, instance) -> str:
@@ -72,6 +74,10 @@ class UserSerializer(ModelSerializer):
                 return "coach"
             case _:
                 return "athlete"
+
+    def get_items(self, obj):
+        items = [uathlete.unit for uathlete in obj.uathlete.all()]
+        return UnitLocationSerializer(items, many=True).data
 
 
 class CoachSerializer(UserSerializer):
@@ -129,7 +135,13 @@ class PositionSerializer(ModelSerializer):
         prev_position = self.context.get("prev_position")
         if prev_position:
             validated_data = get_distance_speed_from_last_position(prev_position, validated_data)
-        return super().create(validated_data)
+        new_position = super().create(validated_data)
+        units_for_create = check_unit_locations(new_position)
+        if units_for_create:
+            athlete_id = validated_data["run"].athlete_id
+            for unit in units_for_create:
+                UnitAthlete.objects.create(athlete_id=athlete_id, unit_id=unit.id)
+        return new_position
 
 
 class SubscribeSerializer(ModelSerializer):

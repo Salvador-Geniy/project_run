@@ -1,4 +1,4 @@
-from django.db.models import Count, Q, Sum, Avg
+from django.db.models import Count, Q, Sum, Avg, Prefetch
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -7,7 +7,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from app_run.models import Run, Position, Challenge, Subscribe, UnitLocation
+from app_run.models import Run, Position, Challenge, Subscribe, UnitLocation, UnitAthlete
 from app_run.serializers import (
     RunSerializer,
     UserSerializer,
@@ -30,9 +30,9 @@ import re
 @api_view(["GET"])
 def get_club_data(request):
     return Response({
-        "company_name": "My company",
-        "slogan": "My slogan",
-        "contacts": "My company contacts",
+        "company_name": "Der company",
+        "slogan": "Der slogan",
+        "contacts": "Der company contacts",
     })
 
 
@@ -56,6 +56,12 @@ class UserReadOnlyViewSet(ReadOnlyModelViewSet):
         qs = (
             User.objects.filter(is_superuser=False)
             .prefetch_related("user_run")
+            .prefetch_related(
+                Prefetch(
+                    "uathlete",
+                    queryset=UnitAthlete.objects.select_related("unit")
+                )
+            )
             .annotate(runs_finished=Count("user_run", filter=Q(user_run__status="finished")))
         )
         type_filter = self.request.query_params.get("type")

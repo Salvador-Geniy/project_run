@@ -74,4 +74,18 @@ class ChallengeAdmin(ModelAdmin):
 
 @admin.register(models.UnitLocation)
 class UnitLocationAdmin(admin.ModelAdmin):
-    pass
+    list_display = [
+        "id",
+        "name",
+        "latitude",
+        "longitude"
+    ]
+
+
+@admin.register(models.UnitAthlete)
+class UnitAthleteAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "athlete",
+        "unit"
+    ]
