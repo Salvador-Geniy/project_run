@@ -324,7 +324,6 @@ class UploadFileView(APIView):
                 value=row[2]
             )
         except ValueError:
-            print(f"Wrong: {row}")
             return row
 
     @staticmethod
