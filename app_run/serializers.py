@@ -54,7 +54,7 @@ class RunSerializer(ModelSerializer):
 class UserSerializer(ModelSerializer):
     type = SerializerMethodField()
     runs_finished = IntegerField(read_only=True)
-    items = SerializerMethodField()
+    # items = SerializerMethodField()
 
     class Meta:
         model = User
@@ -65,7 +65,7 @@ class UserSerializer(ModelSerializer):
             "first_name",
             "type",
             "runs_finished",
-            "items",
+            # "items",
         ]
 
     def get_type(self, instance) -> str:
