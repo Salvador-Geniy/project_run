@@ -28,7 +28,6 @@ from app_run.views import (
     PositionViewSet,
     SubscribeView,
     ChallengeListView,
-    ChallengesSummaryListView,
     ChallengesSummary2,
     CoachAnalytics,
     UploadFileView,

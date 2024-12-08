@@ -1,5 +1,4 @@
 import datetime
-import random
 
 from django.contrib.auth.models import User
 from app_run.models import Run, Position, Subscribe, Challenge, UnitLocation, UnitAthlete
@@ -75,9 +74,9 @@ class UserSerializer(ModelSerializer):
             case _:
                 return "athlete"
 
-    def get_items(self, obj):
-        items = [uathlete.unit for uathlete in obj.uathlete.all()]
-        return UnitLocationSerializer(items, many=True).data
+    # def get_items(self, obj):
+    #     items = [uathlete.unit for uathlete in obj.uathlete.all()]
+    #     return UnitLocationSerializer(items, many=True).data
 
 
 class CoachSerializer(UserSerializer):
