@@ -63,21 +63,6 @@ def get_average_speed(positions: QuerySet["Position"]) -> float:
     return round(avg_speed, 2)
 
 
-def get_cities_for_positions(positions):
-    result = []
-    # try:
-    #     for position in positions:
-    #         response = rg.search((position.latitude, position.longitude))
-    #         city_name = response[0].get("name")
-    #         if city_name:
-    #             result.append(city_name)
-    #
-    # except Exception as e:
-    #     print(e)
-
-    return result
-
-
 def check_unit_locations(position):
     units_for_create = []
     units = list(UnitLocation.objects.all())
