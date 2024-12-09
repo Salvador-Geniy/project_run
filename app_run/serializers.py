@@ -53,7 +53,7 @@ class RunSerializer(ModelSerializer):
 class UserSerializer(ModelSerializer):
     type = SerializerMethodField()
     runs_finished = IntegerField(read_only=True)
-    # items = SerializerMethodField()
+    items = SerializerMethodField()
 
     class Meta:
         model = User
@@ -64,7 +64,7 @@ class UserSerializer(ModelSerializer):
             "first_name",
             "type",
             "runs_finished",
-            # "items",
+            "items",
         ]
 
     def get_type(self, instance) -> str:
@@ -74,7 +74,8 @@ class UserSerializer(ModelSerializer):
             case _:
                 return "athlete"
 
-    # def get_items(self, obj):
+    def get_items(self, obj):
+        return 1
     #     items = [uathlete.unit for uathlete in obj.uathlete.all()]
     #     return UnitLocationSerializer(items, many=True).data
 
