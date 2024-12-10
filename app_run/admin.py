@@ -82,7 +82,7 @@ class UnitLocationAdmin(admin.ModelAdmin):
     ]
 
 
-@admin.register(models.UnitAthlete)
+@admin.register(models.UnitAthleteRelation)
 class UnitAthleteAdmin(admin.ModelAdmin):
     list_display = [
         "id",

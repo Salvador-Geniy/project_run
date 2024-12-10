@@ -111,7 +111,7 @@ class UnitLocation(models.Model):
         verbose_name_plural = "коллекционные предметы"
 
 
-class UnitAthlete(models.Model):
+class UnitAthleteRelation(models.Model):
     athlete = models.ForeignKey(User, on_delete=models.CASCADE, related_name="uathlete")
     unit = models.ForeignKey(UnitLocation, on_delete=models.CASCADE, related_name="aunit")
 

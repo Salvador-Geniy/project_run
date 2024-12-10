@@ -7,7 +7,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from app_run.models import Run, Position, Challenge, Subscribe, UnitLocation, UnitAthlete
+from app_run.models import Run, Position, Challenge, Subscribe, UnitLocation, UnitAthleteRelation
 from app_run.serializers import (
     RunSerializer,
     UserSerializer,
@@ -59,7 +59,7 @@ class UserReadOnlyViewSet(ReadOnlyModelViewSet):
             .prefetch_related(
                 Prefetch(
                     "uathlete",
-                    queryset=UnitAthlete.objects.select_related("unit")
+                    queryset=UnitAthleteRelation.objects.select_related("unit")
                 )
             )
             .annotate(runs_finished=Count("user_run", filter=Q(user_run__status="finished")))

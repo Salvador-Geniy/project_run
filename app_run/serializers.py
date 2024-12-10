@@ -1,7 +1,7 @@
 import datetime
 
 from django.contrib.auth.models import User
-from app_run.models import Run, Position, Subscribe, Challenge, UnitLocation, UnitAthlete
+from app_run.models import Run, Position, Subscribe, Challenge, UnitLocation, UnitAthleteRelation
 from rest_framework.serializers import (
     ModelSerializer,
     SerializerMethodField,
@@ -139,7 +139,7 @@ class PositionSerializer(ModelSerializer):
         if units_for_create:
             athlete_id = validated_data["run"].athlete_id
             for unit in units_for_create:
-                UnitAthlete.objects.create(athlete_id=athlete_id, unit_id=unit.id)
+                UnitAthleteRelation.objects.create(athlete_id=athlete_id, unit_id=unit.id)
         return new_position
 
 
