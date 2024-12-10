@@ -219,7 +219,7 @@ class UnitLocationSerializer(ModelSerializer):
             "name",
             "uid",
             "latitude",
-            "longitude",
+            # "longitude",
             "picture",
             "value"
         ]
