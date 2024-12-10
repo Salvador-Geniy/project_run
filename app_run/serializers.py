@@ -75,7 +75,7 @@ class UserSerializer(ModelSerializer):
                 return "athlete"
 
     def get_items(self, obj):
-        return [1, 2]
+        return []
     #     items = [uathlete.unit for uathlete in obj.uathlete.all()]
     #     return UnitLocationSerializer(items, many=True).data
 
