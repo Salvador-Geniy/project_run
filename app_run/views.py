@@ -347,7 +347,8 @@ class AthleteInfoView(ModelViewSet):
     lookup_field = "user_id"
 
     def get_object(self):
-        obj, _ = AthleteInfo.objects.get_or_create(user_id=self.kwargs.get(self.lookup_field))
+        user = get_object_or_404(User, pk=self.kwargs.get(self.lookup_field))
+        obj, _ = AthleteInfo.objects.get_or_create(user_id=user.id)
         return obj
 
     def update(self, request, *args, **kwargs):
@@ -358,8 +359,6 @@ class AthleteInfoView(ModelViewSet):
         self.perform_update(serializer)
 
         if getattr(instance, '_prefetched_objects_cache', None):
-            # If 'prefetch_related' has been applied to a queryset, we need to
-            # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)

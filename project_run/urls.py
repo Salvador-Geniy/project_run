@@ -32,6 +32,7 @@ from app_run.views import (
     CoachAnalytics,
     UploadFileView,
     UnitLocationListView,
+    AthleteInfoView,
 )
 
 from rest_framework.routers import SimpleRouter
@@ -40,6 +41,7 @@ router = SimpleRouter()
 router.register(r"api/runs", RunViewSet, basename="runs")
 router.register(r"api/users", UserReadOnlyViewSet, basename="users")
 router.register(r"api/positions", PositionViewSet, basename="positions")
+router.register(r"api/athlete_info", AthleteInfoView, basename="athlete-info")
 
 urlpatterns = [
     path('admin/', admin.site.urls),

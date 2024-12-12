@@ -126,7 +126,7 @@ class UnitAthleteRelation(models.Model):
 class AthleteInfo(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="атлет")
     level = models.PositiveSmallIntegerField(
-        null=True,
+        default=1,
         validators=[MinValueValidator(1), MaxValueValidator(5)],
         verbose_name="уровень"
     )
