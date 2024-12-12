@@ -121,3 +121,17 @@ class UnitAthleteRelation(models.Model):
 
     def __str__(self):
         return f"{self.athlete} {self.unit}"
+
+
+class AthleteInfo(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="атлет")
+    level = models.PositiveSmallIntegerField(
+        null=True,
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        verbose_name="уровень"
+    )
+    goals = models.CharField(max_length=255, null=True, blank=True, verbose_name="цели")
+
+    class Meta:
+        verbose_name = "информация атлета"
+        verbose_name_plural = "информация атлетов"

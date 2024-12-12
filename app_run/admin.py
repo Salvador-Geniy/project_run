@@ -89,3 +89,13 @@ class UnitAthleteAdmin(admin.ModelAdmin):
         "athlete",
         "unit"
     ]
+
+
+@admin.register(models.AthleteInfo)
+class AthleteInfoAdmin(admin.ModelAdmin):
+    list_display = [
+        "user_id",
+        "user",
+        "level",
+        "goals",
+    ]

@@ -7,7 +7,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from app_run.models import Run, Position, Challenge, Subscribe, UnitLocation, UnitAthleteRelation
+from app_run.models import Run, Position, Challenge, Subscribe, UnitLocation, UnitAthleteRelation, AthleteInfo
 from app_run.serializers import (
     RunSerializer,
     UserSerializer,
@@ -19,6 +19,7 @@ from app_run.serializers import (
     ChallengesSummaryListSerializer,
     UploadFileSerializer,
     UnitLocationSerializer,
+    AthleteInfoSerializer,
 )
 from django.contrib.auth.models import User
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -339,3 +340,26 @@ class UnitLocationListView(ListAPIView):
     serializer_class = UnitLocationSerializer
 
 
+class AthleteInfoView(ModelViewSet):
+    queryset = AthleteInfo.objects.all()
+    serializer_class = AthleteInfoSerializer
+    http_method_names = ["get", "put"]
+    lookup_field = "user_id"
+
+    def get_object(self):
+        obj, _ = AthleteInfo.objects.get_or_create(user_id=self.kwargs.get(self.lookup_field))
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

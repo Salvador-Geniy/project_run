@@ -1,7 +1,9 @@
 import datetime
 
 from django.contrib.auth.models import User
-from app_run.models import Run, Position, Subscribe, Challenge, UnitLocation, UnitAthleteRelation
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+from app_run.models import Run, Position, Subscribe, Challenge, UnitLocation, UnitAthleteRelation, AthleteInfo
 from rest_framework.serializers import (
     ModelSerializer,
     SerializerMethodField,
@@ -222,4 +224,16 @@ class UnitLocationSerializer(ModelSerializer):
             "longitude",
             "picture",
             "value"
+        ]
+
+
+class AthleteInfoSerializer(ModelSerializer):
+    level = IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    
+    class Meta:
+        model = AthleteInfo
+        fields = [
+            "user_id",
+            "goals",
+            "level"
         ]
