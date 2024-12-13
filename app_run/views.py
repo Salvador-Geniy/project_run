@@ -239,6 +239,8 @@ class ChallengesSummary2(APIView):
 class CoachAnalytics(APIView):
     def get(self, request, coach_id, *args, **kwargs):
         athletes = list(Subscribe.objects.filter(coach_id=coach_id).values_list("athlete_id", flat=True))
+        if not athletes:
+            return Response(status=404)
         data = dict()
         longest_run = Run.objects.filter(athlete__in=athletes).order_by("-distance").first()
         data["longest_run_user"] = longest_run.athlete_id
