@@ -130,7 +130,7 @@ class AthleteInfo(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(5)],
         verbose_name="уровень"
     )
-    goals = models.CharField(max_length=255, null=True, blank=True, verbose_name="цели")
+    goals = models.CharField(max_length=255, null=True, blank=True, default="", verbose_name="цели")
 
     class Meta:
         verbose_name = "информация атлета"
