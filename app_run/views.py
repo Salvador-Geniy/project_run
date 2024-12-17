@@ -7,7 +7,16 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from app_run.models import Run, Position, Challenge, Subscribe, UnitLocation, UnitAthleteRelation, AthleteInfo
+from app_run.models import (
+    Run,
+    Position,
+    Challenge,
+    Subscribe,
+    UnitLocation,
+    UnitAthleteRelation,
+    AthleteInfo,
+    CoachRate
+)
 from app_run.serializers import (
     RunSerializer,
     UserSerializer,
@@ -20,6 +29,7 @@ from app_run.serializers import (
     UploadFileSerializer,
     UnitLocationSerializer,
     AthleteInfoSerializer,
+    CoachRateSerializer,
 )
 from django.contrib.auth.models import User
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -64,14 +74,15 @@ class UserReadOnlyViewSet(ReadOnlyModelViewSet):
                 )
             )
             .annotate(runs_finished=Count("user_run", filter=Q(user_run__status="finished")))
+            .annotate(avg_rating=Avg("coach__rating"))
         )
         type_filter = self.request.query_params.get("type")
         if type_filter:
             match type_filter:
                 case "coach":
-                    qs = qs.filter(is_staff=True).prefetch_related("coach_subscribe")
+                    qs = qs.filter(is_staff=True).prefetch_related("coach_subscribe", "coach")
                 case "athlete":
-                    qs = qs.filter(is_staff=False).select_related("athlete_subscribe")
+                    qs = qs.filter(is_staff=False).select_related("athlete_subscribe", "athlete")
         return qs
 
     def get_serializer_class(self, is_coach: bool):
@@ -364,3 +375,23 @@ class AthleteInfoView(ModelViewSet):
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class CoachRateView(APIView):
+    def post(self, request, coach_id, *args, **kwargs):
+        athlete_id = request.data.get("athlete")
+        if not athlete_id:
+            return Response("Athlete is required field", 400)
+        athlete = get_object_or_404(User.objects.select_related("athlete_subscribe"), is_staff=False, pk=athlete_id)
+        if not athlete.athlete_subscribe:
+            return Response("Athlete doesn't have any subscribe to coach", 400)
+        if athlete.athlete_subscribe.coach and athlete.athlete_subscribe.coach_id != coach_id:
+            return Response("Athlete doesn't can rate this coach", 400)
+        rate_obj, _ = CoachRate.objects.get_or_create(coach_id=coach_id, athlete_id=athlete_id)
+        serializer = CoachRateSerializer(data=request.data, instance=rate_obj)
+        if not serializer.is_valid():
+            return Response(serializer.errors)
+        serializer.save()
+        return Response(serializer.data, 200)
+
+

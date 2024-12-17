@@ -3,7 +3,16 @@ import datetime
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from app_run.models import Run, Position, Subscribe, Challenge, UnitLocation, UnitAthleteRelation, AthleteInfo
+from app_run.models import (
+    Run,
+    Position,
+    Subscribe,
+    Challenge,
+    UnitLocation,
+    UnitAthleteRelation,
+    AthleteInfo,
+    CoachRate,
+)
 from rest_framework.serializers import (
     ModelSerializer,
     SerializerMethodField,
@@ -56,6 +65,7 @@ class UserSerializer(ModelSerializer):
     type = SerializerMethodField()
     runs_finished = IntegerField(read_only=True)
     items = SerializerMethodField()
+    rating = SerializerMethodField()
 
     class Meta:
         model = User
@@ -67,6 +77,7 @@ class UserSerializer(ModelSerializer):
             "type",
             "runs_finished",
             "items",
+            "rating",
         ]
 
     def get_type(self, instance) -> str:
@@ -79,6 +90,11 @@ class UserSerializer(ModelSerializer):
     def get_items(self, obj):
         items = [uathlete.unit for uathlete in obj.uathlete.all()]
         return UnitLocationSerializer(items, many=True).data
+
+    def get_rating(self, obj):
+        if hasattr(obj, "avg_rating"):
+            if obj.avg_rating:
+                return float(obj.avg_rating)
 
 
 class CoachSerializer(UserSerializer):
@@ -238,3 +254,11 @@ class AthleteInfoSerializer(ModelSerializer):
             "goals",
             "level"
         ]
+
+
+class CoachRateSerializer(ModelSerializer):
+    rating = IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+
+    class Meta:
+        model = CoachRate
+        fields = ["id", "rating"]

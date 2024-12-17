@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
@@ -135,3 +135,30 @@ class AthleteInfo(models.Model):
     class Meta:
         verbose_name = "информация атлета"
         verbose_name_plural = "информация атлетов"
+
+
+class CoachRate(models.Model):
+    coach = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        verbose_name="тренер",
+        related_name="coach"
+    )
+    athlete = models.OneToOneField(
+        to=User,
+        on_delete=models.CASCADE,
+        verbose_name="бегун",
+        related_name="athlete"
+    )
+    rating = models.PositiveSmallIntegerField(
+        default=None,
+        null=True,
+        verbose_name="рейтинг",
+    )
+
+    class Meta:
+        verbose_name = "рейтинг тренера"
+        verbose_name_plural = "рейтинги тренеров"
+
+    def __str__(self):
+        return f"{self.coach}, {self.athlete} - rate: {self.rating}"

@@ -99,3 +99,13 @@ class AthleteInfoAdmin(admin.ModelAdmin):
         "level",
         "goals",
     ]
+
+
+@admin.register(models.CoachRate)
+class CoachRateAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "coach",
+        "athlete",
+        "rating",
+    ]
