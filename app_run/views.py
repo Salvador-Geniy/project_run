@@ -379,11 +379,12 @@ class AthleteInfoView(ModelViewSet):
 
 class CoachRateView(APIView):
     def post(self, request, coach_id, *args, **kwargs):
+        coach = get_object_or_404(User, id=coach_id)
         athlete_id = request.data.get("athlete")
         if not athlete_id:
             return Response("Athlete is required field", 400)
         athlete = get_object_or_404(User.objects.select_related("athlete_subscribe"), is_staff=False, pk=athlete_id)
-        subscribe = Subscribe.objects.filter(coach_id=coach_id, athlete=athlete).first()
+        subscribe = Subscribe.objects.filter(coach=coach, athlete=athlete).first()
         if not subscribe:
             return Response("Can't rate", 400)
         if athlete.athlete_subscribe and athlete.athlete_subscribe.coach_id != coach_id:
