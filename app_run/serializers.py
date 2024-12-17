@@ -185,6 +185,7 @@ class ChallengeAthleteSerializer(ModelSerializer):
         fields = [
             "id",
             "full_name",
+            "username",
         ]
 
     def get_full_name(self, obj):
