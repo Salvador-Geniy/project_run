@@ -385,7 +385,7 @@ class CoachRateView(APIView):
         athlete = get_object_or_404(User.objects.select_related("athlete_subscribe"), is_staff=False, pk=athlete_id)
         if not athlete.athlete_subscribe:
             return Response("Athlete doesn't have any subscribe to coach", 400)
-        if athlete.athlete_subscribe.coach and athlete.athlete_subscribe.coach_id != coach_id:
+        if athlete.athlete_subscribe and athlete.athlete_subscribe.coach_id != coach_id:
             return Response("Athlete doesn't can rate this coach", 400)
         rate_obj, _ = CoachRate.objects.get_or_create(coach_id=coach_id, athlete_id=athlete_id)
         serializer = CoachRateSerializer(data=request.data, instance=rate_obj)
