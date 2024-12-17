@@ -258,7 +258,10 @@ class AthleteInfoSerializer(ModelSerializer):
 
 class CoachRateSerializer(ModelSerializer):
     rating = IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    athlete = PrimaryKeyRelatedField(
+        queryset=User.objects.filter(is_staff=False)
+    )
 
     class Meta:
         model = CoachRate
-        fields = ["id", "rating"]
+        fields = ["id", "rating", "athlete"]
