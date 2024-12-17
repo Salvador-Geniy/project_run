@@ -391,7 +391,7 @@ class CoachRateView(APIView):
         rate_obj, _ = CoachRate.objects.get_or_create(coach_id=coach_id, athlete_id=athlete_id)
         serializer = CoachRateSerializer(data=request.data, instance=rate_obj)
         if not serializer.is_valid():
-            return Response(serializer.errors)
+            return Response(serializer.errors, 400)
         serializer.save()
         return Response(serializer.data, 200)
 
