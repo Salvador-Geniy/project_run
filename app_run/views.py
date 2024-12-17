@@ -383,7 +383,7 @@ class CoachRateView(APIView):
         athlete_id = request.data.get("athlete")
         if not athlete_id:
             return Response("Athlete is required field", 400)
-        if not User.objects.filter(is_staff=False, pk=athlete_id).exist():
+        if not User.objects.filter(is_staff=False, pk=athlete_id).exists():
             return Response("No", 400)
         athlete = get_object_or_404(User.objects.select_related("athlete_subscribe"), is_staff=False, pk=athlete_id)
         subscribe = Subscribe.objects.filter(coach=coach, athlete=athlete).first()
