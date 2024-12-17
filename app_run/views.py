@@ -230,7 +230,7 @@ class ChallengesSummary2(APIView):
                     data_map[ch.full_name].add(user)
 
         data = [{"name_to_display": key, "athletes": [
-            {"id": user.id, "full_name": f"{user.first_name} {user.last_name}"} for user in value
+            {"id": user.id, "full_name": f"{user.first_name} {user.last_name}", "username": user.username} for user in value
         ]} for key, value in data_map.items()]
 
         return Response(data=data, status=200)
