@@ -383,8 +383,9 @@ class CoachRateView(APIView):
         if not athlete_id:
             return Response("Athlete is required field", 400)
         athlete = get_object_or_404(User.objects.select_related("athlete_subscribe"), is_staff=False, pk=athlete_id)
-        if not athlete.athlete_subscribe:
-            return Response("Athlete doesn't have any subscribe to coach", 400)
+        subscribe = Subscribe.objects.filter(coach_id=coach_id, athlete=athlete).first()
+        if not subscribe:
+            return Response("Can't rate", 400)
         if athlete.athlete_subscribe and athlete.athlete_subscribe.coach_id != coach_id:
             return Response("Athlete doesn't can rate this coach", 400)
         rate_obj, _ = CoachRate.objects.get_or_create(coach_id=coach_id, athlete_id=athlete_id)
