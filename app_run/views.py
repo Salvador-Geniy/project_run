@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404, CreateAPIView, ListAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -47,6 +48,10 @@ def get_club_data(request):
     })
 
 
+class CustomPagination(PageNumberPagination):
+    page_size_query_param = 'size'
+
+
 class RunViewSet(ModelViewSet):
     queryset = Run.objects.select_related("athlete")
     serializer_class = RunSerializer
@@ -56,6 +61,8 @@ class RunViewSet(ModelViewSet):
     ]
     filterset_fields = ["status", "id"]
     ordering_fields = ["created_at"]
+    pagination_class = CustomPagination
+
 
 
 class UserReadOnlyViewSet(ReadOnlyModelViewSet):
