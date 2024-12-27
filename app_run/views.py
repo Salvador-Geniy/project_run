@@ -53,7 +53,7 @@ class CustomPagination(PageNumberPagination):
 
 
 class RunViewSet(ModelViewSet):
-    queryset = Run.objects.select_related("athlete")
+    queryset = Run.objects.select_related("athlete").order_by("-id")
     serializer_class = RunSerializer
     filter_backends = [
         DjangoFilterBackend,
@@ -62,7 +62,6 @@ class RunViewSet(ModelViewSet):
     filterset_fields = ["status", "id"]
     ordering_fields = ["created_at"]
     pagination_class = CustomPagination
-
 
 
 class UserReadOnlyViewSet(ReadOnlyModelViewSet):
