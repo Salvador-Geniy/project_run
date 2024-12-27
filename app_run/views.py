@@ -61,13 +61,14 @@ class RunViewSet(ModelViewSet):
     ]
     filterset_fields = ["status", "id"]
     ordering_fields = ["created_at"]
-    # pagination_class = CustomPagination
+    pagination_class = CustomPagination
 
 
 class UserReadOnlyViewSet(ReadOnlyModelViewSet):
     serializer_class = UserSerializer
     filter_backends = [SearchFilter]
     search_fields = ["first_name", "last_name"]
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         qs = (
