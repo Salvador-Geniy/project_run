@@ -162,3 +162,12 @@ class CoachRate(models.Model):
 
     def __str__(self):
         return f"{self.coach}, {self.athlete} - rate: {self.rating}"
+
+
+class TestModel(models.Model):
+    name = models.CharField(max_length=255)
+    age = models.IntegerField()
+
+    class Meta:
+        verbose_name = "test model"
+        verbose_name_plural = "test models"
