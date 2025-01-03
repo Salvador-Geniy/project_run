@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
@@ -33,7 +33,7 @@ class Run(models.Model):
     speed = models.FloatField(default=0, verbose_name="средняя скорость в м/с")
 
     def __str__(self):
-        return f"{self.athlete.username}, {self.get_status_display()}"
+        return f"{self.id} {self.athlete.username}, {self.get_status_display()}"
 
     class Meta:
         verbose_name = "забег"
@@ -90,6 +90,87 @@ class Challenge(models.Model):
     class Meta:
         verbose_name = "челлендж"
         verbose_name_plural = "челленджи"
+
+
+class UnitLocation(models.Model):
+    name = models.CharField(max_length=50)
+    uid = models.CharField(max_length=8)
+    latitude = models.FloatField(
+        validators=[MinValueValidator(-90.0), MaxValueValidator(90.0)],
+        verbose_name="широта"
+    )
+    longitude = models.FloatField(
+        validators=[MinValueValidator(-180.0), MaxValueValidator(180.0)],
+        verbose_name="долгота"
+    )
+    picture = models.URLField()
+    value = models.PositiveSmallIntegerField()
+
+    class Meta:
+        verbose_name = "коллекционный предмет"
+        verbose_name_plural = "коллекционные предметы"
+
+
+class UnitAthleteRelation(models.Model):
+    athlete = models.ForeignKey(User, on_delete=models.CASCADE, related_name="uathlete")
+    unit = models.ForeignKey(UnitLocation, on_delete=models.CASCADE, related_name="aunit")
+
+    class Meta:
+        verbose_name = "награда бегуна"
+        verbose_name_plural = "награды бегуна"
+
+    def __str__(self):
+        return f"{self.athlete} {self.unit}"
+
+
+class AthleteInfo(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="атлет")
+    level = models.PositiveSmallIntegerField(
+        default=1,
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        verbose_name="уровень"
+    )
+    goals = models.CharField(max_length=255, null=True, blank=True, default="", verbose_name="цели")
+
+    class Meta:
+        verbose_name = "информация атлета"
+        verbose_name_plural = "информация атлетов"
+
+
+class CoachRate(models.Model):
+    coach = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        verbose_name="тренер",
+        related_name="coach"
+    )
+    athlete = models.OneToOneField(
+        to=User,
+        on_delete=models.CASCADE,
+        verbose_name="бегун",
+        related_name="athlete"
+    )
+    rating = models.PositiveSmallIntegerField(
+        default=None,
+        null=True,
+        verbose_name="рейтинг",
+    )
+
+    class Meta:
+        verbose_name = "рейтинг тренера"
+        verbose_name_plural = "рейтинги тренеров"
+
+    def __str__(self):
+        return f"{self.coach}, {self.athlete} - rate: {self.rating}"
+
+
+class TestModel(models.Model):
+    name = models.CharField(max_length=255)
+    age = models.IntegerField()
+
+    class Meta:
+        verbose_name = "test model"
+        verbose_name_plural = "test models"
 
 
 class DevTestModel(models.Model):

@@ -1,5 +1,6 @@
 from geopy.distance import geodesic
-from .models import Position
+
+from .models import Position, UnitLocation
 from django.db.models import Min, Max, QuerySet, Avg
 
 
@@ -60,3 +61,13 @@ def get_average_speed(positions: QuerySet["Position"]) -> float:
         return 0
     avg_speed = positions.aggregate(avg_speed=Avg("speed")).get("avg_speed")
     return round(avg_speed, 2)
+
+
+def check_unit_locations(position):
+    units_for_create = []
+    units = list(UnitLocation.objects.all())
+    for unit in units:
+        dist = geodesic((position.latitude, position.longitude), (unit.latitude, unit.longitude)).meters
+        if dist <= 100:
+            units_for_create.append(unit)
+    return units_for_create

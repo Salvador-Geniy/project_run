@@ -1,7 +1,18 @@
 import datetime
 
 from django.contrib.auth.models import User
-from app_run.models import Run, Position, Subscribe, Challenge
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+from app_run.models import (
+    Run,
+    Position,
+    Subscribe,
+    Challenge,
+    UnitLocation,
+    UnitAthleteRelation,
+    AthleteInfo,
+    CoachRate,
+)
 from rest_framework.serializers import (
     ModelSerializer,
     SerializerMethodField,
@@ -11,8 +22,10 @@ from rest_framework.serializers import (
     FloatField,
     DateTimeField,
     PrimaryKeyRelatedField,
+    Serializer,
+    FileField,
 )
-from .services import get_distance_speed_from_last_position
+from .services import get_distance_speed_from_last_position, check_unit_locations
 
 
 class UserDataSerializer(ModelSerializer):
@@ -51,6 +64,8 @@ class RunSerializer(ModelSerializer):
 class UserSerializer(ModelSerializer):
     type = SerializerMethodField()
     runs_finished = IntegerField(read_only=True)
+    items = SerializerMethodField()
+    rating = SerializerMethodField()
 
     class Meta:
         model = User
@@ -61,6 +76,8 @@ class UserSerializer(ModelSerializer):
             "first_name",
             "type",
             "runs_finished",
+            "items",
+            "rating",
         ]
 
     def get_type(self, instance) -> str:
@@ -69,6 +86,15 @@ class UserSerializer(ModelSerializer):
                 return "coach"
             case _:
                 return "athlete"
+
+    def get_items(self, obj):
+        items = [uathlete.unit for uathlete in obj.uathlete.all()]
+        return UnitLocationSerializer(items, many=True).data
+
+    def get_rating(self, obj):
+        if hasattr(obj, "avg_rating"):
+            if obj.avg_rating:
+                return float(obj.avg_rating)
 
 
 class CoachSerializer(UserSerializer):
@@ -126,7 +152,13 @@ class PositionSerializer(ModelSerializer):
         prev_position = self.context.get("prev_position")
         if prev_position:
             validated_data = get_distance_speed_from_last_position(prev_position, validated_data)
-        return super().create(validated_data)
+        new_position = super().create(validated_data)
+        units_for_create = check_unit_locations(new_position)
+        if units_for_create:
+            athlete_id = validated_data["run"].athlete_id
+            for unit in units_for_create:
+                UnitAthleteRelation.objects.create(athlete_id=athlete_id, unit_id=unit.id)
+        return new_position
 
 
 class SubscribeSerializer(ModelSerializer):
@@ -152,8 +184,6 @@ class SubscribeSerializer(ModelSerializer):
 
 
 class ChallengeSerializer(ModelSerializer):
-    athlete = UserSerializer(read_only=True)
-
     class Meta:
         model = Challenge
         fields = [
@@ -161,3 +191,74 @@ class ChallengeSerializer(ModelSerializer):
             "full_name",
             "athlete",
         ]
+
+
+class ChallengeAthleteSerializer(ModelSerializer):
+    full_name = SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "full_name",
+            "username",
+        ]
+
+    def get_full_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}"
+
+
+class ChallengesSummaryListSerializer(Serializer):
+    name_to_display = CharField(source="full_name")
+    athletes = ChallengeAthleteSerializer(many=True)
+
+
+CITIES = [
+    "New York",
+    "Paris",
+    "Maiami",
+    "Toronto",
+    "San Francisco",
+    "Los Angeles",
+    "Buenos Aires",
+    "Tokio",
+    "Kioto"
+]
+
+
+class UploadFileSerializer(Serializer):
+    file = FileField()
+
+
+class UnitLocationSerializer(ModelSerializer):
+    class Meta:
+        model = UnitLocation
+        fields = [
+            "id",
+            "name",
+            "uid",
+            "latitude",
+            "longitude",
+            "picture",
+            "value"
+        ]
+
+
+class AthleteInfoSerializer(ModelSerializer):
+    level = IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    
+    class Meta:
+        model = AthleteInfo
+        fields = [
+            "user_id",
+            "goals",
+            "level"
+        ]
+
+
+class CoachRateSerializer(ModelSerializer):
+    rating = IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+
+    class Meta:
+        model = CoachRate
+        fields = ["id", "rating"]

@@ -17,17 +17,20 @@ class RunAdmin(ModelAdmin):
         "status",
         "distance",
         "run_time_seconds",
+        "speed",
         "created_at",
     )
 
     fields = (
         "athlete",
         "comment",
+        "speed",
+        "distance",
     )
 
     def get_fields(self, request, obj=None):
         if obj:
-            return ("comment", "status")
+            return ["comment", "status", "speed", "distance"]
         return self.fields
 
 
@@ -66,4 +69,43 @@ class ChallengeAdmin(ModelAdmin):
         "id",
         "full_name",
         "athlete",
+    ]
+
+
+@admin.register(models.UnitLocation)
+class UnitLocationAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "name",
+        "latitude",
+        "longitude"
+    ]
+
+
+@admin.register(models.UnitAthleteRelation)
+class UnitAthleteAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "athlete",
+        "unit"
+    ]
+
+
+@admin.register(models.AthleteInfo)
+class AthleteInfoAdmin(admin.ModelAdmin):
+    list_display = [
+        "user_id",
+        "user",
+        "level",
+        "goals",
+    ]
+
+
+@admin.register(models.CoachRate)
+class CoachRateAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "coach",
+        "athlete",
+        "rating",
     ]
