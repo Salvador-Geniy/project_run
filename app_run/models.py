@@ -95,3 +95,7 @@ class Challenge(models.Model):
 class DevTestModel(models.Model):
     name = models.CharField(max_length=255)
     count = models.PositiveSmallIntegerField()
+
+    class Meta:
+        verbose_name = "dev test model"
+        verbose_name_plural = "dev test models"
