@@ -90,3 +90,8 @@ class Challenge(models.Model):
     class Meta:
         verbose_name = "челлендж"
         verbose_name_plural = "челленджи"
+
+
+class DevTestModel(models.Model):
+    name = models.CharField(max_length=255)
+    count = models.PositiveSmallIntegerField()
