@@ -261,6 +261,8 @@ class CoachAnalytics(APIView):
             return Response({}, status=404)
         data = dict()
         longest_run = Run.objects.filter(athlete__in=athletes).order_by("-distance").first()
+        if not longest_run:
+            return Response({}, status=404)
         data["longest_run_user"] = longest_run.athlete_id
         data["longest_run_value"] = longest_run.distance
 
