@@ -43,13 +43,13 @@ import re
 @api_view(["GET"])
 def get_club_data(request):
     return Response({
-        "company_name": "Der company",
+        "company_name": "Der run club",
         "slogan": "Our club's slogan is very simple, "
                   "but not very short. And if you want to read our slogan from beginning to end, "
                   "you will have to cook something tasty, "
                   "because you can spend all your time for this day reading our slogan... "
                   "So, there is it: Let's fun!",
-        "contacts": "Der company contacts",
+        "contacts": "Der run club contacts: phone: +0-00-000-00-00, email: ooo_oo@derclub.com",
     })
 
 
