@@ -66,7 +66,7 @@ class UserSerializer(ModelSerializer):
     runs_finished = IntegerField(read_only=True)
     items = SerializerMethodField()
     rating = SerializerMethodField()
-    date_joined = DateTimeField(format="%Y-%m-%dT%H:%M:%S.%f", read_only=True)
+    date_joined = DateTimeField(format="%Y-%m-%d", read_only=True)
 
     class Meta:
         model = User
