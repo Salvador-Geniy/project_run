@@ -78,6 +78,7 @@ class UserSerializer(ModelSerializer):
             "runs_finished",
             "items",
             "rating",
+            "date_joined",
         ]
 
     def get_type(self, instance) -> str:
