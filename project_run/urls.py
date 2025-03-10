@@ -39,14 +39,14 @@ from app_run.views import (
 from rest_framework.routers import SimpleRouter
 router = SimpleRouter()
 
-# router.register(r"api/runs", RunViewSet, basename="runs")
-# router.register(r"api/users", UserReadOnlyViewSet, basename="users")
+router.register(r"api/runs", RunViewSet, basename="runs")
+router.register(r"api/users", UserReadOnlyViewSet, basename="users")
 router.register(r"api/positions", PositionViewSet, basename="positions")
 router.register(r"api/athlete_info", AthleteInfoView, basename="athlete-info")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('api/company_details/', get_club_data, name='company-details'),
+    path('api/company_details/', get_club_data, name='company-details'),
     path("api/runs/<int:run_id>/start/", RunStartView.as_view(), name="run-start"),
     path("api/runs/<int:run_id>/stop/", RunStopView.as_view(), name="run-start"),
     path("api/subscribe_to_coach/<int:id>/", SubscribeView.as_view(), name="subscribe-to-coach"),
