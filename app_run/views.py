@@ -60,7 +60,7 @@ class RunViewSet(ModelViewSet):
         DjangoFilterBackend,
         OrderingFilter,
     ]
-    filterset_fields = ["status", "id"]
+    filterset_fields = ["status", "id", "athlete"]
     ordering_fields = ["created_at"]
     pagination_class = CustomPagination
 
