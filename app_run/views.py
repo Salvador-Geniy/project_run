@@ -62,7 +62,7 @@ class RunViewSet(ModelViewSet):
     ]
     filterset_fields = ["status", "id", "athlete"]
     ordering_fields = ["created_at"]
-    pagination_class = CustomPagination
+    # pagination_class = CustomPagination
 
 
 class UserReadOnlyViewSet(ReadOnlyModelViewSet):
