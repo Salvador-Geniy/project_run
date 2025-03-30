@@ -55,7 +55,6 @@ class CustomPagination(PageNumberPagination):
 
 
 class RunViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
     queryset = Run.objects.select_related("athlete").order_by("-id")
     serializer_class = RunSerializer
     filter_backends = [
