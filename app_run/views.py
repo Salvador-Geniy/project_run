@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404, CreateAPIView, ListAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import MultiPartParser
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
@@ -53,20 +54,17 @@ class CustomPagination(PageNumberPagination):
     page_size_query_param = 'size'
 
 
-class RunViewSet(APIView):
-    def get(self, request, *args, **kwargs):
-        return Response("Not ok", status=status.HTTP_401_UNAUTHORIZED)
-
-# class RunViewSet(ModelViewSet):
-#     queryset = Run.objects.select_related("athlete").order_by("-id")
-#     serializer_class = RunSerializer
-#     filter_backends = [
-#         DjangoFilterBackend,
-#         OrderingFilter,
-#     ]
-#     filterset_fields = ["status", "id", "athlete"]
-#     ordering_fields = ["created_at"]
-#     pagination_class = CustomPagination
+class RunViewSet(ModelViewSet):
+    authentication_classes = [IsAuthenticated]
+    queryset = Run.objects.select_related("athlete").order_by("-id")
+    serializer_class = RunSerializer
+    filter_backends = [
+        DjangoFilterBackend,
+        OrderingFilter,
+    ]
+    filterset_fields = ["status", "id", "athlete"]
+    ordering_fields = ["created_at"]
+    pagination_class = CustomPagination
 
 
 class UserReadOnlyViewSet(ReadOnlyModelViewSet):
